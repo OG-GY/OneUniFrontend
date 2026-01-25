@@ -15,6 +15,8 @@ export function InfoCard({ title, icon: Icon, children, className }: InfoCardPro
         {Icon && (
           <div className="w-8 h-8 rounded-lg bg-primary/5 flex items-center justify-center text-primary">
             <Icon size={18} />
+
+            
           </div>
         )}
         <h3 className="text-lg font-semibold text-text-main">{title}</h3>
