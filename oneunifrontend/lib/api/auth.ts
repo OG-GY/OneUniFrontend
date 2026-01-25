@@ -3,7 +3,19 @@ import { ENDPOINTS } from '@/lib/api/endpoint';
 
 // ============ Types ============
 
-export type Role = 'student' | 'mentor';
+export type Role = 'student' | 'mentor' | 'university_representative';
+
+const ROLE_TO_ID: Record<Role, number> = {
+  student: 0,
+  mentor: 1,
+  university_representative: 2,
+};
+
+const ID_TO_ROLE: Record<number, Role> = {
+  0: 'student',
+  1: 'mentor',
+  2: 'university_representative',
+};
 
 export interface LoginRequest {
   email: string;
@@ -17,32 +29,50 @@ export interface RegisterRequest {
   role: Role;
 }
 
-export interface AuthTokens {
-  accessToken: string;
-  refreshToken: string;
-}
-
 export interface User {
   id: string;
   email: string;
-  name: string;
+  name?: string;
   role: Role;
+}
+
+interface ApiUser {
+  id: string;
+  email: string;
+  name?: string;
+  role: number;
 }
 
 export interface AuthResponse {
   user: User;
-  tokens: AuthTokens;
+  expiresAt: string;
+}
+
+interface ApiAuthResponse {
+  user: ApiUser;
+  expiresAt: string;
 }
 
 export interface CompleteSignupPayload {
   role: Role;
 }
 
-export interface CompleteSignupResponse {
-  id: string;
-  email: string;
-  name: string;
-  role: Role;
+// ============ Helpers ============
+
+function mapApiUserToUser(apiUser: ApiUser): User {
+  return {
+    ...apiUser,
+    role: ID_TO_ROLE[apiUser.role] || 'student', // Fallback to student
+  };
+}
+
+// Client-side helper to read cookie if needed, but usually browser handles it.
+// However, typically XSRF token needs to be read from cookie and sent in header.
+// I'll add a simple helper for that.
+function getXsrfToken(): string | null {
+  if (typeof document === 'undefined') return null;
+  const match = document.cookie.match(new RegExp('(^| )XSRF-TOKEN=([^;]+)'));
+  return match ? decodeURIComponent(match[2]) : null;
 }
 
 // ============ API Functions ============
@@ -51,6 +81,11 @@ export interface CompleteSignupResponse {
  * Register a new user with email/password.
  */
 export async function register(payload: RegisterRequest): Promise<AuthResponse> {
+  const apiPayload = {
+    ...payload,
+    role: ROLE_TO_ID[payload.role],
+  };
+
   const response = await fetch(`${env.apiUrl}${ENDPOINTS.REGISTER}`, {
     method: 'POST',
     headers: {
@@ -58,7 +93,7 @@ export async function register(payload: RegisterRequest): Promise<AuthResponse> 
       'Accept': 'application/json',
     },
     credentials: 'include',
-    body: JSON.stringify(payload),
+    body: JSON.stringify(apiPayload),
   });
 
   if (!response.ok) {
@@ -66,7 +101,11 @@ export async function register(payload: RegisterRequest): Promise<AuthResponse> 
     throw new Error(error.message || 'Registration failed');
   }
 
-  return response.json();
+  const data: ApiAuthResponse = await response.json();
+  return {
+    ...data,
+    user: mapApiUserToUser(data.user),
+  };
 }
 
 /**
@@ -88,13 +127,17 @@ export async function login(payload: LoginRequest): Promise<AuthResponse> {
     throw new Error(error.message || 'Login failed');
   }
 
-  return response.json();
+  const data: ApiAuthResponse = await response.json();
+  return {
+    ...data,
+    user: mapApiUserToUser(data.user),
+  };
 }
 
 /**
  * Refresh access token using refresh token.
  */
-export async function refreshToken(): Promise<AuthTokens> {
+export async function refreshToken(): Promise<AuthResponse> {
   const response = await fetch(`${env.apiUrl}${ENDPOINTS.REFRESH}`, {
     method: 'POST',
     headers: {
@@ -107,7 +150,11 @@ export async function refreshToken(): Promise<AuthTokens> {
     throw new Error('Token refresh failed');
   }
 
-  return response.json();
+  const data: ApiAuthResponse = await response.json();
+  return {
+    ...data,
+    user: mapApiUserToUser(data.user),
+  };
 }
 
 /**
@@ -132,6 +179,7 @@ export async function getMe(): Promise<User> {
     method: 'GET',
     headers: {
       'Accept': 'application/json',
+      'X-XSRF-TOKEN': getXsrfToken() || '',
     },
     credentials: 'include',
   });
@@ -140,13 +188,18 @@ export async function getMe(): Promise<User> {
     throw new Error('Failed to get user');
   }
 
-  return response.json();
+  const data: ApiUser = await response.json();
+  return mapApiUserToUser(data);
 }
 
 /**
  * Complete Google OAuth signup with role selection.
  */
-export async function completeGoogleSignup(payload: CompleteSignupPayload): Promise<CompleteSignupResponse> {
+export async function completeGoogleSignup(payload: CompleteSignupPayload): Promise<AuthResponse> {
+  const apiPayload = {
+    role: ROLE_TO_ID[payload.role],
+  };
+
   const response = await fetch(`${env.apiUrl}${ENDPOINTS.GOOGLE_OAUTH_COMPLETE_SIGNUP}`, {
     method: 'POST',
     headers: {
@@ -154,7 +207,7 @@ export async function completeGoogleSignup(payload: CompleteSignupPayload): Prom
       'Accept': 'application/json',
     },
     credentials: 'include',
-    body: JSON.stringify(payload),
+    body: JSON.stringify(apiPayload),
   });
 
   if (!response.ok) {
@@ -162,5 +215,9 @@ export async function completeGoogleSignup(payload: CompleteSignupPayload): Prom
     throw new Error(error.message || 'Signup completion failed');
   }
 
-  return response.json();
+  const data: ApiAuthResponse = await response.json();
+  return {
+    ...data,
+    user: mapApiUserToUser(data.user),
+  };
 }

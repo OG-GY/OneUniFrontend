@@ -18,6 +18,8 @@ const SORT_OPTIONS = [
 ];
 
 export default function MentorsPage() {
+  const [activeTab, setActiveTab] = useState("browse");
+  const [sessionTab, setSessionTab] = useState("upcoming");
   const [activeFilter, setActiveFilter] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("recommended");
@@ -47,6 +49,30 @@ export default function MentorsPage() {
     <div className="min-h-screen bg-slate-50 p-4 md:p-8 font-sans">
       <div className="max-w-7xl mx-auto">
         
+        {/* Main Tabs */}
+        <div className="flex gap-4 mb-8 border-b border-slate-200">
+           <button 
+              onClick={() => setActiveTab("browse")}
+              className={cn(
+                  "pb-3 px-1 text-sm font-medium transition-all border-b-2",
+                  activeTab === "browse" ? "border-primary text-primary" : "border-transparent text-slate-500 hover:text-slate-700"
+              )}
+           >
+              Browse Mentors
+           </button>
+           <button 
+              onClick={() => setActiveTab("sessions")}
+              className={cn(
+                  "pb-3 px-1 text-sm font-medium transition-all border-b-2",
+                  activeTab === "sessions" ? "border-primary text-primary" : "border-transparent text-slate-500 hover:text-slate-700"
+              )}
+           >
+              My Sessions
+           </button>
+        </div>
+
+        {activeTab === "browse" ? (
+         <>
         {/* Hero Section */}
         <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-blue-600 to-indigo-700 px-8 py-12 md:px-12 md:py-16 mb-10 shadow-xl">
           {/* Decorative Background Elements */}
@@ -155,6 +181,46 @@ export default function MentorsPage() {
             </div>
           )}
         </div>
+        </>
+        ) : (
+            // My Sessions Tab
+            <div className="flex flex-col gap-6">
+                <div className="flex gap-2 bg-white p-1 rounded-lg w-fit border border-slate-200">
+                    <button 
+                        onClick={() => setSessionTab("upcoming")}
+                        className={cn(
+                            "px-4 py-2 text-sm font-medium rounded-md transition-all",
+                            sessionTab === "upcoming" ? "bg-blue-50 text-primary" : "text-slate-500 hover:text-slate-700 hover:bg-slate-50"
+                        )}
+                    >
+                        Upcoming
+                    </button>
+                    <button 
+                        onClick={() => setSessionTab("past")}
+                        className={cn(
+                            "px-4 py-2 text-sm font-medium rounded-md transition-all",
+                            sessionTab === "past" ? "bg-blue-50 text-primary" : "text-slate-500 hover:text-slate-700 hover:bg-slate-50"
+                        )}
+                    >
+                        Past
+                    </button>
+                </div>
+                
+                <div className="w-full flex flex-col items-center justify-center py-20 bg-white rounded-xl border border-slate-200 border-dashed">
+                    <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4">
+                        <Users className="text-slate-300" size={32} />
+                    </div>
+                    <p className="text-slate-900 font-medium text-lg">No {sessionTab} sessions</p>
+                    <p className="text-slate-500 text-sm mt-1 mb-6">You don't have any {sessionTab} mentorship sessions.</p>
+                    <button 
+                        onClick={() => setActiveTab("browse")}
+                        className="px-6 py-2 bg-primary text-white rounded-lg font-medium hover:bg-primary/90 transition-colors"
+                    >
+                        Browse Mentors
+                    </button>
+                </div>
+            </div>
+        )}
       </div>
     </div>
   );

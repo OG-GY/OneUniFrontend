@@ -1,11 +1,14 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Content from "@/components/sections/(Auth)/content-section";
 import LoginForm from "@/components/forms/LoginForm";
 import { motion } from "framer-motion";
+import { login } from "@/lib/api/auth";
 
 export default function LoginPage() {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -39,11 +42,23 @@ export default function LoginPage() {
 
     if (Object.keys(newErrors).length === 0) {
       setIsLoading(true);
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      console.log("Login submitted:", formData);
-      setIsLoading(false);
-      // Add login logic here
+      try {
+        await login({
+          email: formData.email,
+          password: formData.password,
+        });
+        router.push("/redirecting");
+      } catch (error: any) {
+        console.error("Login error:", error);
+        // Handle specific error messages if possible (e.g. 401)
+        if (error.message.toLowerCase().includes("credentials") || error.message.toLowerCase().includes("invalid")) {
+           setErrors({ root: "Invalid email or password" });
+        } else {
+           setErrors({ root: error.message || "Login failed. Please try again." });
+        }
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
 
@@ -57,13 +72,20 @@ export default function LoginPage() {
         transition={{ duration: 0.3 }}
         className="flex-1 flex items-center justify-center p-6 sm:p-8 lg:p-12 bg-white w-full min-h-screen"
       >
-        <LoginForm 
-          formData={formData}
-          errors={errors}
-          onChange={handleChange}
-          onSubmit={handleSubmit}
-          isLoading={isLoading}
-        />
+        <div className="w-full max-w-[440px] flex flex-col gap-4">
+           {errors.root && (
+              <div className="p-3 text-sm text-red-500 bg-red-50 rounded-md">
+                {errors.root}
+              </div>
+            )}
+            <LoginForm 
+              formData={formData}
+              errors={errors}
+              onChange={handleChange}
+              onSubmit={handleSubmit}
+              isLoading={isLoading}
+            />
+        </div>
       </motion.div>
     </section>
   );

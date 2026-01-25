@@ -1,27 +1,26 @@
 "use client";
-import { useState } from "react";
-import { ChevronRight, ChevronLeft } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
-import RegistrationFormSection from "@/components/sections/(Auth)/registrationform-section";
-import CreatePasswordForm from "@/components/forms/CreatePasswordForm";
-import SuccessModal from "@/components/ui/success-modal";
-import StepIndicator from "@/components/ui/stepIndicator";
-import Content from "@/components/sections/(Auth)/content-section";
 
-type Role = "student" | "mentor" | "";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
+import { ChevronRight } from "lucide-react";
+import Content from "@/components/sections/(Auth)/content-section";
+import RegistrationForm from "@/components/forms/RegistrationForm";
+import Button from "@/components/ui/button";
+import { register } from "@/lib/api/auth";
+import type { Role } from "@/lib/api/auth";
 
 export default function RegistrationPage() {
-  const [currentStep, setCurrentStep] = useState(1);
+  const router = useRouter();
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
-    role: "" as Role,
+    role: "" as Role | "",
     password: "",
     confirmPassword: "",
   });
-
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [isComplete, setIsComplete] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -31,172 +30,120 @@ export default function RegistrationPage() {
     }
   };
 
-  const handleRoleSelect = (role: Role) => {
+  const handleRoleSelect = (role: Role | "") => {
     setFormData((prev) => ({ ...prev, role }));
     if (errors.role) {
       setErrors((prev) => ({ ...prev, role: "" }));
     }
   };
 
-  const validateStep = (step: number) => {
+  const validateForm = () => {
     const newErrors: Record<string, string> = {};
 
-    if (step === 1) {
-      if (!formData.fullName.trim()) {
-        newErrors.fullName = "Full name is required";
-      }
-      if (!formData.email.trim()) {
-        newErrors.email = "Email is required";
-      } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-        newErrors.email = "Please enter a valid email";
-      }
-      if (!formData.role) {
-        newErrors.role = "Please select your role";
-      }
+    if (!formData.fullName.trim()) newErrors.fullName = "Full name is required";
+    
+    if (!formData.email.trim()) {
+      newErrors.email = "Email is required";
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = "Please enter a valid email";
     }
 
-    if (step === 2) {
-      if (!formData.password) {
-        newErrors.password = "Password is required";
-      } else if (formData.password.length < 8) {
-        newErrors.password = "Password must be at least 8 characters";
-      }
-      if (formData.password !== formData.confirmPassword) {
-        newErrors.confirmPassword = "Passwords do not match";
-      }
+    if (!formData.role) newErrors.role = "Please select your role";
+
+    if (!formData.password) {
+      newErrors.password = "Password is required";
+    } else if (formData.password.length < 6) {
+      newErrors.password = "Password must be at least 6 characters";
+    }
+
+    if (formData.password !== formData.confirmPassword) {
+      newErrors.confirmPassword = "Passwords do not match";
     }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleNext = () => {
-    if (validateStep(currentStep)) {
-      if (currentStep === 2) {
-        setIsComplete(true);
-        setTimeout(() => {
-          console.log("Form submitted:", formData);
-        }, 2000);
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!validateForm()) return;
+
+    setIsLoading(true);
+    try {
+      await register({
+        fullName: formData.fullName,
+        email: formData.email,
+        password: formData.password,
+        role: formData.role as Role,
+      });
+      // Redirect to redirecting screen on success
+      router.push("/redirecting");
+    } catch (error: any) {
+      if (error.message.includes("exists")) {
+        setErrors((prev) => ({ ...prev, email: "User already exists" }));
       } else {
-        setCurrentStep(currentStep + 1);
+        // General error handling - validation errors could be mapped here if backend returns them
+        console.error("Registration error:", error);
+        // For now, show a generic error or toast - since no global toast is set up in this context, 
+        // I'll set a form-level error or just log it. 
+        // Ideally we'd use the toast component from components/ui/toast
+        // checking imports... I see toast.tsx in components/ui.
+        // I will just use a generic alert or error state if I can't easily access toast context.
+        // But the requirements said "Inline validation errors".
+        // I'll set a generic error on the email field or a general error state if suitable.
+        // Actually, let's just assume inline errors are sufficient for specific fields.
+        // If it's a 500, maybe alerting is fine for MVP.
+         setErrors((prev) => ({ ...prev, root: error.message || "Something went wrong" }));
       }
+    } finally {
+      setIsLoading(false);
     }
-  };
-
-  const handleBack = () => {
-    if (currentStep > 1) {
-      setCurrentStep(currentStep - 1);
-    }
-  };
-
-  const handleCloseModal = () => {
-    setIsComplete(false);
   };
 
   return (
-    <>
-      <SuccessModal
-        isOpen={isComplete}
-        title="Welcome aboard!"
-        description="Your account has been created successfully. You can now access all the resources and features."
-        firstName={formData.fullName.split(" ")[0]}
-        onClose={handleCloseModal}
-        actionLabel="Get Started"
-        onAction={handleCloseModal}
-      />
-      <section className="min-h-screen flex flex-col lg:flex-row">
-        <Content />
-        <AnimatePresence mode="wait">
-          {currentStep === 1 && (
-            <motion.div
-              key="step1"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.3 }}
-              className="flex-1 flex"
-            >
-              <RegistrationFormSection
-                formData={{
-                  fullName: formData.fullName,
-                  email: formData.email,
-                  role: formData.role,
-                }}
-                errors={errors}
-                onChange={handleChange}
-                onRoleSelect={handleRoleSelect}
-                onNext={handleNext}
-                currentStep={currentStep}
-              />
-            </motion.div>
-          )}
-
-          {currentStep === 2 && (
-            <motion.div
-              key="step2"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.3 }}
-              className="flex-1 flex items-center justify-center p-6 sm:p-8 lg:p-12 bg-white w-full min-h-screen"
-            >
-              <div className="flex flex-col gap-[32px] w-full max-w-[480px]">
-                {/* Step Indicator */}
-                <StepIndicator totalSteps={2} currentStep={currentStep} />
-
-                {/* Form Content */}
-                <div className="w-full">
-                  <CreatePasswordForm
-                    formData={{
-                      password: formData.password,
-                      confirmPassword: formData.confirmPassword,
-                    }}
-                    errors={errors}
-                    onChange={handleChange}
-                  />
-                </div>
-
-                {/* Navigation Buttons */}
-                <div className="flex items-center gap-[12px] w-full">
-                  <motion.button
-                    type="button"
-                    onClick={handleBack}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    className="flex items-center justify-center gap-[8px] px-[24px] py-[14px] bg-white border-2 border-slate-200 hover:border-slate-300 rounded-[10px] font-medium text-[16px] text-text-muted transition-all"
-                  >
-                    <ChevronLeft size={20} />
-                    Back
-                  </motion.button>
-                  <motion.button
-                    type="button"
-                    onClick={handleNext}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    className="flex-1 flex items-center justify-center gap-[8px] px-[32px] py-[14px] bg-primary hover:bg-primary/90 rounded-[10px] font-semibold text-[16px] text-white transition-all shadow-md"
-                  >
-                    Create Account
-                    <ChevronRight size={20} />
-                  </motion.button>
-                </div>
-
-                {/* Footer */}
-                <div className="flex items-center justify-center gap-[8px] w-full pt-[8px]">
-                  <p className="text-[14px] text-text-muted">
-                    Already have an account?
-                  </p>
-                  <button
-                    type="button"
-                    className="font-medium text-[14px] text-primary hover:underline"
-                  >
-                    Sign in
-                  </button>
-                </div>
+    <section className="min-h-screen flex flex-col lg:flex-row">
+      <Content />
+      <div className="flex-1 flex items-center justify-center p-6 sm:p-8 lg:p-12 bg-white w-full min-h-screen">
+        <div className="flex flex-col gap-[32px] w-full max-w-[480px]">
+          {/* Form Content */}
+          <form onSubmit={handleSubmit} className="w-full flex flex-col gap-8">
+            <RegistrationForm
+              formData={formData}
+              errors={errors}
+              onChange={handleChange}
+              onRoleSelect={handleRoleSelect as any}
+            />
+            {errors.root && (
+              <div className="p-3 text-sm text-red-500 bg-red-50 rounded-md">
+                {errors.root}
               </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </section>
-    </>
+            )}
+            <Button
+              type="submit"
+              variant="primary"
+              disabled={isLoading}
+              className="w-full h-[52px] text-[16px]"
+              iconRight={!isLoading ? <ChevronRight size={20} /> : undefined}
+            >
+              {isLoading ? "Creating Account..." : "Create Account"}
+            </Button>
+          </form>
+
+          {/* Footer */}
+          <div className="flex items-center justify-center gap-[8px] w-full pt-[8px]">
+            <p className="text-[14px] text-text-muted">
+              Already have an account?
+            </p>
+            <button
+              type="button"
+              onClick={() => router.push("/login")}
+              className="font-medium text-[14px] text-primary hover:underline"
+            >
+              Sign in
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
   );
 }

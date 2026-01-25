@@ -25,7 +25,7 @@ export default function LoginCallbackPage() {
   useEffect(() => {
     if (status === "success") {
       const redirectTimer = setTimeout(() => {
-        router.push("/student/dashboard");
+        router.push("/redirecting");
       }, 1500);
 
       return () => clearTimeout(redirectTimer);

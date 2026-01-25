@@ -10,10 +10,10 @@ import { motion, AnimatePresence, useScroll, useMotionValueEvent } from "framer-
 import { cn } from "@/lib/utils"
 
 const NAV_ITEMS = [
-  { id: 'features', label: 'Features' },
-  { id: 'why-us', label: 'Why Us' },
-  { id: 'testimonials', label: 'Testimonials' },
-  { id: 'contact', label: 'Contact' },
+  { id: 'programs', label: 'Programs', href: '/programs' },
+  { id: 'admissions', label: 'Admissions', href: '/admissions' },
+  { id: 'campus-life', label: 'Campus Life', href: '/campus-life' },
+  { id: 'research', label: 'Research', href: '/research' },
 ]
 
 export default function Header() {
@@ -51,8 +51,8 @@ export default function Header() {
   return (
     <motion.header 
       className={cn(
-        "sticky top-0 z-50 transition-all duration-300 border-b border-transparent",
-        isScrolled ? "glass shadow-minimal" : "bg-transparent"
+        "sticky top-0 z-50 transition-all duration-300 border-b border-transparent font-sans",
+        isScrolled ? "bg-white/90 dark:bg-slate-900/90 backdrop-blur-md shadow-sm" : "bg-transparent"
       )}
       initial={{ y: -100 }}
       animate={{ y: 0 }}
@@ -64,54 +64,44 @@ export default function Header() {
              <Image 
                src={OneUniL} 
                alt="Logo" 
-               className="w-auto h-12 md:h-16 object-contain" 
-               width={150} 
-               height={64}
+               className="w-auto h-8 md:h-10 object-contain" 
+               width={120} 
+               height={48}
                priority
              />
           </motion.div>
-          <span className="font-bold text-lg md:text-xl text-foreground flex flex-col md:flex-row md:gap-1 leading-tight">
-             <span style={{ color: "var(--brand-yellow)" }}>One-</span>
-             <span className="text-primary">University</span>
+          <span className="font-bold text-lg md:text-xl text-foreground flex items-center gap-0.5 leading-tight">
+             <span className="text-primary">OneUni</span>
           </span>
         </Link>
 
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center gap-8">
           {NAV_ITEMS.map((item) => (
-            <button
+            <Link
               key={item.id}
-              onClick={() => document.getElementById(item.id)?.scrollIntoView({ behavior: 'smooth' })}
-              className="relative cursor-pointer text-muted-foreground hover:text-foreground transition-colors font-medium group py-2"
+              href={item.href}
+              className="relative cursor-pointer text-sm text-muted-foreground hover:text-primary transition-colors font-medium group py-2"
             >
               {item.label}
-              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-accent transition-all duration-300 group-hover:w-full" />
-            </button>
+              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary transition-all duration-300 group-hover:w-full" />
+            </Link>
           ))}
         </div>
 
         {/* CTA Button and Theme Toggle */}
-        <div className="hidden md:flex items-center gap-4">
-          <motion.button 
-            whileTap={{ scale: 0.95 }}
-            onClick={toggleTheme} 
-            className="p-2 rounded-full hover:bg-muted transition-colors" 
-            aria-label="Toggle theme"
-          >
-            {isDark ? <Sun size={20} className="text-accent" /> : <Moon size={20} className="text-muted-foreground" />}
-          </motion.button>
+        <div className="hidden md:flex items-center gap-6">
           <Link
             href="/login"
-            className="text-muted-foreground hover:text-foreground transition font-medium"
+            className="text-sm font-semibold text-primary hover:text-primary/80 transition"
           >
             Log in
           </Link>
           <Link href="/registration">
             <Button
-              variant="primary"
-              className="shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all duration-300 hover:-translate-y-0.5"
+              className="bg-secondary hover:bg-secondary/90 text-white font-semibold rounded-full px-6 shadow-md shadow-secondary/20 hover:-translate-y-0.5 transition-all"
             >
-              Get Started
+              Apply Now
             </Button>
           </Link>
         </div>

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { GraduationCap, Briefcase, ChevronRight, Loader2 } from "lucide-react";
+import { GraduationCap, Briefcase, ChevronRight, Loader2, Building2 } from "lucide-react";
 import Content from "@/components/sections/(Auth)/content-section";
 import RoleSelector from "@/components/ui/role-selector";
 import Button from "@/components/ui/button";
@@ -30,14 +30,8 @@ export default function SignupCallbackPage() {
     setError("");
 
     try {
-      const user = await completeGoogleSignup({ role });
-      
-      // Redirect based on role
-      if (user.role === "mentor") {
-        router.push("/mentor/dashboard");
-      } else {
-        router.push("/student/dashboard");
-      }
+      await completeGoogleSignup({ role });
+      router.push("/redirecting");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to complete registration. Please try again.");
       setIsLoading(false);
@@ -80,20 +74,27 @@ export default function SignupCallbackPage() {
             <label className="font-medium text-[14px] text-text-body">
               I want to join as
             </label>
-            <div className="flex gap-4">
+            <div className="grid grid-cols-3 gap-4">
               <RoleSelector
                 roleId="student"
                 label="Student"
                 icon={GraduationCap}
                 isSelected={role === "student"}
-                onRoleSelect={handleRoleSelect}
+                onRoleSelect={handleRoleSelect as any}
               />
               <RoleSelector
                 roleId="mentor"
                 label="Mentor"
                 icon={Briefcase}
                 isSelected={role === "mentor"}
-                onRoleSelect={handleRoleSelect}
+                onRoleSelect={handleRoleSelect as any}
+              />
+              <RoleSelector
+                roleId="university_representative"
+                label="University"
+                icon={Building2}
+                isSelected={role === "university_representative"}
+                onRoleSelect={handleRoleSelect as any}
               />
             </div>
 

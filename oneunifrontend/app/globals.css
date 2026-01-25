@@ -344,3 +344,14 @@
   scrollbar-width: none;  /* Firefox */
 }
 
+/* Mask Utility for Infinite Scroll */
+.mask-linear-fade {
+  mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+}
+
+/* Gradient XY Animation */
+.animate-gradient-xy {
+  background-size: 400% 400%;
+  animation: gradientBG 15s ease infinite;
+}
