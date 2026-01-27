@@ -112,43 +112,33 @@ export default function Hero() {
              <div className="absolute top-10 right-0 w-[480px] h-[520px] bg-[#D6D3C8] rounded-3xl overflow-hidden shadow-2xl rotate-3 border-4 border-white z-10">
                 {/* Mock Image Content */}
                 <div className="relative w-full h-full flex flex-col justify-between p-8">
-                   <div className="text-right">
+                   {/* <div className="text-right">
                       <p className="font-handwriting text-4xl text-slate-800 opacity-80 rotate-[-5deg] inline-block mr-8 mt-8">Unforgettable</p>
                       <p className="font-serif text-5xl text-slate-900 mt-2">Natural</p>
-                   </div>
+                   </div> */}
                    
-                   {/* Abstract People Illustration Placeholder */}
-                   <div className="absolute inset-0 top-32 pointer-events-none">
-                       {/* This would ideally be a real image, using divs to mock the layout for now */}
-                       <div className="absolute bottom-0 w-full h-3/4 bg-contain bg-no-repeat bg-bottom opacity-90" style={{ backgroundImage: 'url(https://img.freepik.com/free-vector/college-students-concept-illustration_114360-1020.jpg?w=826&t=st=1704870000~exp=1704870600~hmac=mock)' }}></div>
+                   {/* OneUniN Image */}
+                   <div className="absolute inset-0 top-20 pointer-events-none z-0">
+                      <Image
+                        src={OneUniN}
+                        alt="OneUni visual"
+                        fill
+                        className="object-contain object-bottom opacity-90"
+                        priority
+                      />
                    </div>
 
                    <div className="absolute bottom-8 left-8 text-white z-20">
                       <p className="font-bold text-lg">Community of Innovators</p>
-                      <p className="text-xs opacity-80">Join 150+ nationalities</p>
+                      <p className="text-xs opacity-80">Join 50+ Universities Collection</p>
                    </div>
+
+                   
                    
                    {/* Gradient Overlay */}
                    <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-transparent z-10" />
                 </div>
              </div>
-
-             {/* Floating Badge - Application Status */}
-             <motion.div 
-                className="absolute bottom-24 left-10 bg-white/90 backdrop-blur-md p-4 rounded-2xl shadow-xl z-30 flex items-center gap-4 dark:bg-white border border-white/50"
-                animate={{ y: [0, -10, 0] }}
-                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-             >
-                <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-600">
-                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                      <polyline points="20 6 9 17 4 12"></polyline>
-                   </svg>
-                </div>
-                <div>
-                   <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Application Status</p>
-                   <p className="text-sm font-bold text-slate-900">Documents Approved</p>
-                </div>
-             </motion.div>
 
              {/* Floating Badge - Admission Open */}
              <motion.div 
