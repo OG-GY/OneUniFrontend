@@ -249,27 +249,39 @@ export const REASONS = [
 export const TESTIMONIALS = [
   {
     id: "t1",
-    name: "Zainab Khalil",
-    role: "Undergraduate FJWU, Session 2022",
+    name: "Sarah Jenkins",
+    role: "B.Sc. Computer Science, Class of '25",
     content:
-      "A platform ilke One University is really needed. We'll surely support such platform.",
+      "The OneUni platform made applying so incredibly simple. I could track every step, talk to counselors, and I knew exactly when my acceptance letter arrived.",
     rating: 5,
+    image: "https://img.freepik.com/free-photo/young-beautiful-woman-pink-warm-sweater-natural-look-smiling-portrait-isolated-long-hair_285396-896.jpg"
   },
   {
     id: "t2",
-    name: "Shayan Ahmad",
-    role: "Undergraduate, Session 2023",
+    name: "Zainab Khalil",
+    role: "Undergraduate FJWU, Session 2022",
     content:
-      "I heard Khalil's idea and that really fascinates me. A platform like this is really needed.",
+      "A platform like One University is really needed. We'll surely support such platform and help fellow students.",
     rating: 5,
+    image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=150&h=150&auto=format&fit=crop"
   },
   {
     id: "t3",
+    name: "Shayan Ahmad",
+    role: "Undergraduate, Session 2023",
+    content:
+      "I heard about this idea and that really fascinates me. A platform like this is really needed to bridge the gap.",
+    rating: 5,
+    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=150&h=150&auto=format&fit=crop"
+  },
+  {
+    id: "t4",
     name: "Ayan Ahmad",
     role: "Undergraduate, Session 2025",
     content:
-      "Finally, a platform that understands what students need. Game-changer!",
+      "Finally, a platform that understands what students need. The mentor support is exceptional!",
     rating: 5,
+    image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=150&h=150&auto=format&fit=crop"
   },
 ];
 
