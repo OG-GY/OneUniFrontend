@@ -12,31 +12,31 @@ const STEPS = [
   },
   {
     number: "Step 02",
-    title: "Document Upload",
-    description: "Securely upload transcripts and portfolios. Our AI checks for completeness instantly.",
-    icon: "Upload",
+    title: "University Search",
+    description: "Explore universities that match your interests and preferences.",
+    icon: "Search", // Assuming you have an icon for search
     position: "top" // Card stays above the line
   },
   {
     number: "Step 03",
-    title: "Interview",
-    description: "Schedule and attend your faculty interview directly through the integrated video portal.",
-    icon: "Video",
+    title: "Application Submission",
+    description: "Complete and submit your application to your chosen university.",
+    icon: "Upload",
     position: "bottom"
   },
   {
     number: "Step 04",
     title: "Offer & Accept",
-    description: "Receive your digital offer letter and secure your spot with a single click.",
+    description: "Receive your digital acceptance, visit and secure your spot with one click.",
     icon: "Award",
     position: "top"
   },
 ];
 
-import { UserPlus, Upload, Video, Award } from "lucide-react"
+import { UserPlus, Upload, Video, Award , Search, } from "lucide-react"
 
 const ICON_MAP = {
-  UserPlus, Upload, Video, Award
+  UserPlus, Upload, Video, Award, Search, 
 }
 
 export default function StepsSection() {
