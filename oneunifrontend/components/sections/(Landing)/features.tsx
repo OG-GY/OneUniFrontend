@@ -7,25 +7,25 @@ const FEATURES = [
   {
     icon: LayoutGrid,
     title: "Unified Portal",
-    description: "Manage your application documents, status, and communication in one single, secure dashboard. No more lost emails.",
+    description: "Manage your application documents, status, and communication for all your universities in one single, secure dashboard. No more lost platforms.",
     color: "bg-blue-100 text-blue-600"
   },
   {
     icon: Clock,
-    title: "Real-time Tracking",
-    description: "Never miss a deadline with automated alerts and real-time status updates on your admission progress.",
+    title: "Automated Applications",
+    description: "Never miss a deadline with automated applications, alerts and real-time status updates on your admission progress.",
     color: "bg-amber-100 text-amber-600"
   },
   {
     icon: Users,
     title: "Student Life Connection",
-    description: "Connect with future classmates, join clubs, and explore housing options before you even arrive on campus.",
+    description: "Connect with future classmates, professional mentors, and explore housing options before you even arrive on campus.",
     color: "bg-green-100 text-green-600"
   },
   {
     icon: GraduationCap,
     title: "Expert Guidance",
-    description: "Access on-demand counseling and academic advice through integrated video calls and chat support.",
+    description: "Access on-demand counseling and academic advice through integrated meetings and chat support.",
     color: "bg-purple-100 text-purple-600"
   }
 ]
