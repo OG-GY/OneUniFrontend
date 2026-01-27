@@ -22,7 +22,7 @@ export default function Testimonials() {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
           >
-            <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-6 leading-tight">
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-6 leading-tight">
               Join a global community of <br />
               ambitious learners.
             </h2>
