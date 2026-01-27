@@ -70,7 +70,7 @@ export default function CTA() {
              width={160}
              height={160}
              className="w-full h-full object-contain drop-shadow-2xl"
-             style={{ transform: 'scaleY(-1)' }}
+            //  style={{ transform: 'scaleY(-1)' }}
              priority
            />
          </div>
