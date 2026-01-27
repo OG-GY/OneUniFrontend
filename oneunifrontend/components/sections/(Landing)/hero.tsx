@@ -29,7 +29,7 @@ export default function Hero() {
   };
 
   return (
-    <section className="relative bg-slate-50 pt-32 pb-20 overflow-hidden font-sans">
+    <section className="relative bg-slate-50 pt-4 pb-20 overflow-hidden font-sans">
        {/* Graph Grid Background */}
        <div className="absolute inset-0 z-0 opacity-40">
            <div className="absolute inset-0" style={{ 
