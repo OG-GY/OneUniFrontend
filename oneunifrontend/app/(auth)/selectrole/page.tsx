@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
 import { GraduationCap, Briefcase, ChevronRight } from "lucide-react";
 import Content from "@/components/sections/(Auth)/content-section";
 import RoleSelector from "@/components/ui/role-selector";
@@ -12,6 +13,7 @@ type Role = "student" | "mentor" | "";
 export default function SelectRolePage() {
   const [role, setRole] = useState<Role>("");
   const [error, setError] = useState("");
+  const router = useRouter();
 
   const handleRoleSelect = (selectedRole: Role) => {
     setRole(selectedRole);
@@ -23,8 +25,13 @@ export default function SelectRolePage() {
       setError("Please select a role to continue");
       return;
     }
-    console.log("Selected role:", role);
-    // Navigate to next step
+    
+    if (role === "student") {
+      router.push("/onboarding/student");
+    } else {
+      // For now, mentor onboarding isn't implemented
+      console.log("Selected role:", role);
+    }
   };
 
   return (
@@ -55,15 +62,6 @@ export default function SelectRolePage() {
 
           <div className="flex flex-col gap-6">
             <div className="flex gap-4">
-              <div className="flex-1">
-                 <RoleSelector
-                  roleId="student"
-                  label="Student"
-                  icon={GraduationCap}
-                  isSelected={role === "student"}
-                  onRoleSelect={handleRoleSelect}
-                />
-              </div>
               <div className="flex-1">
                 <RoleSelector
                   roleId="mentor"

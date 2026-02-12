@@ -1,9 +1,8 @@
-// components/PasswordInput.tsx
 "use client";
 import React, { useMemo, useState } from "react";
 import Input from "./input";
-import { motion, AnimatePresence } from "framer-motion";
 import { Eye, EyeOff, Lock, Check } from "lucide-react";
+import clsx from "clsx";
 
 type Strength = { strength: number; label: string; color: string };
 
@@ -21,15 +20,6 @@ const getPasswordStrength = (password = ""): Strength => {
   return { strength, label: "Strong", color: "bg-emerald-500" };
 };
 
-/**
- * Toggle password visibility state
- * @param currentState - Current visibility state
- * @returns Toggled visibility state
- */
-const togglePasswordVisibility = (currentState: boolean): boolean => {
-  return !currentState;
-};
-
 type PasswordInputProps = {
   label?: string;
   name: string;
@@ -38,7 +28,6 @@ type PasswordInputProps = {
   error?: string | null;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void;
-  // optional confirm value to show match-check (parent manages confirm field)
   confirmValue?: string;
   className?: string;
   disabled?: boolean;
@@ -59,7 +48,6 @@ export default function PasswordInput({
   showRequirements = true,
 }: PasswordInputProps) {
   const [visible, setVisible] = useState(false);
-  const [touched, setTouched] = useState(false);
   const passwordStrength = useMemo(() => getPasswordStrength(value), [value]);
 
   const meets8 = value.length >= 8;
@@ -77,118 +65,74 @@ export default function PasswordInput({
         type={visible ? "text" : "password"}
         leftIcon={<Lock size={18} />}
         rightIcon={visible ? <EyeOff size={18} /> : <Eye size={18} />}
-        onRightIconClick={() => setVisible(togglePasswordVisibility(visible))}
+        onRightIconClick={() => setVisible(!visible)}
         error={error}
-        onChange={(e) => {
-          setTouched(true);
-          onChange(e);
-        }}
-        onBlur={(e) => {
-          setTouched(true);
-          onBlur?.(e);
-        }}
+        onChange={onChange}
+        onBlur={onBlur}
         disabled={disabled}
       />
 
-     {/* Password Stregth Meter */}
+      {/* Password Strength Meter */}
       {value && (
-        <motion.div
-          initial={{ opacity: 0, height: 0 }}
-          animate={{ opacity: 1, height: "auto" }}
-          className="flex flex-col gap-[8px] pt-[8px]"
-        >
-          <div className="w-full h-[8px] bg-[#f1f5f9] rounded-full overflow-hidden">
-            <motion.div
-              className={`h-full rounded-full ${passwordStrength.color}`}
-              initial={{ width: 0 }}
-              animate={{ width: `${passwordStrength.strength}%` }}
-              transition={{ duration: 0.25 }}
+        <div className="flex flex-col gap-2 pt-3 animate-in fade-in slide-in-from-top-1 duration-200">
+          <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
+            <div
+              className={`h-full rounded-full transition-all duration-300 ${passwordStrength.color}`}
+              style={{ width: `${passwordStrength.strength}%` }}
             />
           </div>
-          <p
-            className={`font-medium text-[13px] ${passwordStrength.color.replace('bg-', 'text-')}`}
-          >
-            Password strength: {passwordStrength.label}
+          <p className={clsx("font-bold text-[12px]", passwordStrength.color.replace('bg-', 'text-'))}>
+            Strength: <span className="font-bold">{passwordStrength.label}</span>
           </p>
-        </motion.div>
+        </div>
       )}
 
-      {/* confirm-check */}
+      {/* Confirm Check */}
       {typeof confirmValue === "string" && confirmValue.length > 0 && (
-        <div className="pt-[8px]">
+        <div className="pt-2">
           {confirmValue === value ? (
-            <div className="flex items-center gap-2 text-emerald-500">
-              <Check size={16} strokeWidth={3} />
-              <span className="text-[13px]">Passwords match</span>
+            <div className="flex items-center gap-2 text-emerald-600 animate-in fade-in duration-200">
+              <Check size={14} strokeWidth={3} />
+              <span className="text-[12px] font-bold">Passwords match</span>
             </div>
           ) : (
-            <div className="flex items-center gap-2 text-red-500">
-              <span className="text-[13px]">Passwords do not match</span>
+            <div className="flex items-center gap-2 text-red-500 animate-in fade-in duration-200">
+              <span className="text-[12px] font-bold">Passwords do not match</span>
             </div>
           )}
         </div>
       )}
 
-      <AnimatePresence>
-        {showRequirements && value.length > 0 && !allMet && (
-          <motion.div
-            initial={{ opacity: 0, height: 0, marginTop: 0 }}
-            animate={{ opacity: 1, height: "auto", marginTop: 12 }}
-            exit={{ opacity: 0, height: 0, marginTop: 0 }}
-            className="p-4 bg-slate-50 border border-slate-100 rounded-xl overflow-hidden"
-          >
-            <p className="font-medium text-[13px] text-text-muted mb-3">
-              Password requirements:
-            </p>
-            <ul className="space-y-2">
-              <li className="flex items-center gap-3">
-                <div
-                  className={`w-5 h-5 rounded-full flex items-center justify-center transition-colors duration-200 ${
-                    meets8 ? "bg-emerald-500" : "bg-slate-200"
-                  }`}
-                >
-                  {meets8 && <Check size={12} className="text-white" strokeWidth={3} />}
+      {/* Requirements List */}
+      {showRequirements && value.length > 0 && !allMet && (
+        <div className="mt-4 p-4 bg-slate-50 border border-slate-100 rounded-xl animate-in fade-in slide-in-from-top-2 duration-300">
+          <p className="font-bold text-[12px] text-text-muted mb-3 uppercase tracking-wider">
+            Required:
+          </p>
+          <ul className="space-y-2.5">
+            {[
+              { met: meets8, label: "Minimum 8 characters" },
+              { met: meetsCase, label: "Uppercase & Lowercase" },
+              { met: meetsNumber, label: "At least one number" }
+            ].map((req, i) => (
+              <li key={i} className="flex items-center gap-3">
+                <div className={clsx(
+                  "w-5 h-5 rounded-full flex items-center justify-center transition-colors duration-200",
+                  req.met ? "bg-emerald-500" : "bg-slate-200"
+                )}>
+                  {req.met && <Check size={12} className="text-white" strokeWidth={3} />}
                 </div>
-                <span className={`text-[13px] transition-colors duration-200 ${
-                  meets8 ? "text-text-body" : "text-slate-400"
-                }`}>
-                  At least 8 characters
+                <span className={clsx(
+                  "text-[13px] font-medium transition-colors duration-200",
+                  req.met ? "text-text-main" : "text-slate-500"
+                )}>
+                  {req.label}
                 </span>
               </li>
-
-              <li className="flex items-center gap-3">
-                <div
-                  className={`w-5 h-5 rounded-full flex items-center justify-center transition-colors duration-200 ${
-                    meetsCase ? "bg-emerald-500" : "bg-slate-200"
-                  }`}
-                >
-                  {meetsCase && <Check size={12} className="text-white" strokeWidth={3} />}
-                </div>
-                <span className={`text-[13px] transition-colors duration-200 ${
-                  meetsCase ? "text-text-body" : "text-slate-400"
-                }`}>
-                  Mix of uppercase & lowercase
-                </span>
-              </li>
-
-              <li className="flex items-center gap-3">
-                <div
-                  className={`w-5 h-5 rounded-full flex items-center justify-center transition-colors duration-200 ${
-                    meetsNumber ? "bg-emerald-500" : "bg-slate-200"
-                  }`}
-                >
-                  {meetsNumber && <Check size={12} className="text-white" strokeWidth={3} />}
-                </div>
-                <span className={`text-[13px] transition-colors duration-200 ${
-                  meetsNumber ? "text-text-body" : "text-slate-400"
-                }`}>
-                  At least one number
-                </span>
-              </li>
-            </ul>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   );
 }

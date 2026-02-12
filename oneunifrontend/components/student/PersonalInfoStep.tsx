@@ -31,7 +31,7 @@ export function PersonalInfoStep({ data, updateData, onNext, onBack }: PersonalI
   };
 
   const handleNext = () => {
-    const newErrors=ValidatePersonalInfo(data);
+    const newErrors = ValidatePersonalInfo(data);
     setErrors(newErrors);
     const hasErrors = Object.values(newErrors).some((msg) => msg && msg.length);
     if (!hasErrors) {
@@ -40,147 +40,138 @@ export function PersonalInfoStep({ data, updateData, onNext, onBack }: PersonalI
   };
 
   return (
-    <div className="w-full h-full flex flex-col gap-6">
+    <div className="flex flex-col gap-10">
       {/* Header */}
-      <div className="flex flex-col gap-1">
-        <h1 className="text-2xl font-bold text-text-main">Personal Information</h1>
-        <p className="text-text-muted">Provide your basic details as they appear on official documents.</p>
+      <div className="flex flex-col gap-2">
+        <h2 className="text-2xl font-bold text-text-main tracking-tight">Personal Information</h2>
+        <p className="text-sm text-slate-500 font-medium">Please provide your details exactly as they appear on your government documents.</p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Main Content - Form */}
-        <div className="lg:col-span-8">
-          <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              {/* Full Name */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+        {/* Form Side */}
+        <div className="lg:col-span-8 flex flex-col gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-6">
+            <Input
+              label="Full Name"
+              name="fullName"
+              value={data.fullName}
+              onChange={handleChange}
+              placeholder="Full Name"
+              leftIcon={<User size={18} />}
+              error={errors.fullName}
+            />
+
+            <Input
+              label="Father's Name"
+              name="fatherName"
+              value={data.fatherName}
+              onChange={handleChange}
+              placeholder="Father's Name"
+              leftIcon={<User size={18} />}
+              error={errors.fatherName}
+            />
+
+            <Input
+              label="CNIC Number"
+              name="cnic"
+              value={data.cnic}
+              onChange={handleChange}
+              placeholder="12345-1234567-1"
+              leftIcon={<CreditCard size={18} />}
+              error={errors.cnic}
+            />
+
+            <Input
+              label="Date of Birth"
+              name="dateOfBirth"
+              type="date"
+              value={data.dateOfBirth}
+              onChange={handleChange}
+              leftIcon={<Calendar size={18} />}
+              error={errors.dateOfBirth}
+            />
+
+            <Select
+              label="Gender"
+              name="gender"
+              value={data.gender}
+              onChange={handleChange as any}
+              error={errors.gender}
+              options={[
+                { label: "Select Gender", value: "" },
+                { label: "Male", value: "male" },
+                { label: "Female", value: "female" },
+                { label: "Other", value: "other" },
+              ]}
+              className="h-[54px]"
+            />
+
+            <Input
+              label="Phone Number"
+              name="phone"
+              type="tel"
+              value={data.phone}
+              onChange={handleChange}
+              placeholder="03XX-XXXXXXX"
+              leftIcon={<Phone size={18} />}
+              error={errors.phone}
+            />
+
+            <div className="md:col-span-2">
               <Input
-                label={<>Full Name <span className="text-red-500">*</span></>}
-                name="fullName"
-                value={data.fullName}
+                label="Email Address"
+                name="email"
+                type="email"
+                value={data.email}
                 onChange={handleChange}
-                placeholder="Your full name"
-                leftIcon={<User size={18} />}
-                error={(errors.fullName)}
+                placeholder="your.email@example.com"
+                leftIcon={<Mail size={18} />}
+                error={errors.email}
               />
-
-              {/* Father Name */}
-              <Input
-                label={<>Father's Name <span className="text-red-500">*</span></>}
-                name="fatherName"
-                value={data.fatherName}
-                onChange={handleChange}
-                placeholder="Father's name"
-                leftIcon={<User size={18} />}
-                error={errors.fatherName}
-              />
-
-              {/* CNIC */}
-              <Input
-                label={<>CNIC <span className="text-red-500">*</span></>}
-                name="cnic"
-                value={data.cnic}
-                onChange={handleChange}
-                placeholder="12345-1234567-1"
-                leftIcon={<CreditCard size={18} />}
-                error={errors.cnic}
-              />
-
-              {/* Date of Birth */}
-              <Input
-                label={<>Date of Birth <span className="text-red-500">*</span></>}
-                name="dateOfBirth"
-                type="date"
-                value={data.dateOfBirth}
-                onChange={handleChange}
-                leftIcon={<Calendar size={18} />}
-                error={errors.dateOfBirth}
-              />
-
-              {/* Gender */}
-              <Select
-                label={<>Gender <span className="text-red-500">*</span></>}
-                name="gender"
-                value={data.gender}
-                onChange={handleChange as any}
-                error={errors.gender}
-                options={[
-                  { label: "Select Gender", value: "" },
-                  { label: "Male", value: "male" },
-                  { label: "Female", value: "female" },
-                  { label: "Other", value: "other" },
-                ]}
-              />
-
-              {/* Phone */}
-              <Input
-                label={<>Phone <span className="text-red-500">*</span></>}
-                name="phone"
-                type="tel"
-                value={data.phone}
-                onChange={handleChange}
-                placeholder="03XX-XXXXXXX"
-                leftIcon={<Phone size={18} />}
-                error={errors.phone}
-              />
-
-              {/* Email - Full Width */}
-              <div className="md:col-span-2">
-                <Input
-                  label={<>Email Address <span className="text-red-500">*</span></>}
-                  name="email"
-                  type="email"
-                  value={data.email}
-                  onChange={handleChange}
-                  placeholder="your.email@example.com"
-                  leftIcon={<Mail size={18} />}
-                  error={errors.email}
-                />
-              </div>
             </div>
           </div>
         </div>
 
-        {/* Sidebar */}
-        <div className="lg:col-span-4 flex flex-col gap-6">
-          {/* Photo Upload Card */}
-          <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex flex-col items-center text-center gap-4">
-            <div className="relative group">
-              <div className="w-32 h-32 bg-slate-50 rounded-full flex items-center justify-center border-4 border-white shadow-md overflow-hidden">
+        {/* Photo Upload Side */}
+        <div className="lg:col-span-4 flex flex-col gap-8">
+          <div className="flex flex-col items-center gap-6 p-6 bg-slate-50 rounded-xl border border-slate-200">
+            <div className="relative">
+              <div className="w-32 h-32 bg-white rounded-full flex items-center justify-center border-2 border-slate-200 overflow-hidden shadow-sm">
                 {data.photo ? (
                   <img src={URL.createObjectURL(data.photo)} alt="Profile" className="w-full h-full object-cover" />
                 ) : (
-                  <User size={48} className="text-slate-300" />
+                  <User size={48} className="text-slate-200" />
                 )}
               </div>
-              <label className="absolute bottom-0 right-0 p-2.5 bg-primary text-white rounded-full cursor-pointer hover:bg-primary/90 transition-all shadow-lg hover:scale-110 active:scale-95">
-                <Camera size={18} />
+              <label className="absolute bottom-0 right-0 p-3 bg-primary text-white rounded-full cursor-pointer hover:bg-brand-blue-dark transition-all shadow-md">
+                <Camera size={16} />
                 <input type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
               </label>
             </div>
-            <div>
-              <h3 className="font-semibold text-text-main">Profile Photo</h3>
-              <p className="text-xs text-text-muted mt-1">Upload a clear passport-size photo</p>
+            <div className="text-center">
+              <p className="font-bold text-text-main text-sm">Profile Photo</p>
+              <p className="text-[11px] text-slate-500 mt-1 font-medium leading-relaxed">
+                Upload a clear passport-size photo.
+              </p>
             </div>
           </div>
 
-          {/* Actions Card */}
-          <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex flex-col gap-3">
+          <div className="flex flex-col gap-3">
             <Button
               onClick={handleNext}
-              className="w-full py-3.5 rounded-lg shadow-sm"
+              className="w-full h-12 rounded-lg text-sm font-bold shadow-sm"
               iconRight={<ChevronRight size={18} />}
             >
               Save & Continue
             </Button>
             
-            <Button
-              variant="ghost"
+            <button
               onClick={onBack}
-              className="w-full py-3 text-text-body hover:bg-slate-50 rounded-lg"
-              iconLeft={<ChevronLeft size={18} />}
+              className="w-full py-2 text-slate-500 hover:text-text-main text-xs font-bold transition-colors flex items-center justify-center gap-2"
             >
+              <ChevronLeft size={14} />
               Go Back
-            </Button>
+            </button>
           </div>
         </div>
       </div>

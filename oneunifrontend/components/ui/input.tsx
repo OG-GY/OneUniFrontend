@@ -1,9 +1,9 @@
+"use client";
 import clsx from "clsx";
-import { ReactNode, useState } from "react";
-import { motion } from "framer-motion";
+import { useState } from "react";
 
 type InputProps = {
-  label?: React.ReactNode;
+  label?: string;
   placeholder?: string;
   value?: string;
   name?: string;
@@ -48,85 +48,88 @@ export default function Input({
     setIsFocused(true);
   };
 
-  // Show error if:
-  // 1. There is an error AND
-  // 2. The field has been touched OR the error is present (implying submit)
-  // 3. AND the field is NOT currently focused (optional, keeps UI clean while typing)
   const showError = error && (hasBeenTouched || error) && !isFocused;
+  const isFloating = isFocused || (value && value.length > 0);
 
   return (
-    <div className={clsx("flex flex-col gap-[6px]", classname)}>
-      {label && (
-        <label
-          htmlFor={name}
-          className="font-medium text-[14px] text-text-body ml-1"
-        >
-          {label}
-        </label>
-      )}
-
-      <div className="relative group">
+    <div className={clsx("flex flex-col min-h-[70px]", classname)}>
+      {/* Label and Input Container */}
+      <div className="relative mt-[10px]">
+        {/* Left Icon - Positioned absolutely inside the input area */}
         {leftIcon && (
           <div className={clsx(
-            "absolute left-[16px] top-1/2 -translate-y-1/2 transition-colors duration-200",
-            error ? "text-red-400" : "text-text-muted group-focus-within:text-primary"
+            "absolute left-4 top-1/2 -translate-y-1/2 z-10 transition-colors duration-200 pointer-events-none",
+            error ? "text-red-400" : "text-text-muted",
+            isFocused && !error && "text-primary",
+            disabled && "opacity-50"
           )}>
             {leftIcon}
           </div>
         )}
 
+        {/* The Input - The anchor for the layout */}
         <input
           id={name}
           name={name}
           value={value}
           type={type}
-          placeholder={placeholder}
+          placeholder={isFocused ? placeholder : ""}
           disabled={disabled}
           onChange={onChange}
           onFocus={handleFocus}
           onBlur={handleBlur}
           className={clsx(
-            "w-full",
-            leftIcon ? "pl-[48px]" : "pl-[20px]",
-            rightIcon ? "pr-[48px]" : "pr-[20px]",
-            "py-[14px]",
-            "bg-white border rounded-xl",
-            "text-[15px] text-text-main",
-            "placeholder:text-text-muted",
-            "transition-all duration-200 ease-in-out",
-            "shadow-sm hover:shadow-md",
-            disabled && "opacity-60 cursor-not-allowed bg-slate-50",
+            "peer w-full h-[54px] transition-all duration-200 border rounded-xl bg-transparent outline-none z-0 px-4",
+            "text-[15px] text-text-main font-medium",
+            leftIcon && "pl-12",
+            rightIcon && "pr-12",
             error 
               ? "border-red-300 focus:border-red-500 focus:ring-4 focus:ring-red-500/10" 
-              : "border-slate-200 hover:border-slate-300 focus:border-primary focus:ring-4 focus:ring-primary/10"
+              : "border-slate-200 hover:border-slate-300 focus:border-primary focus:ring-4 focus:ring-primary/10",
+            disabled && "opacity-60 cursor-not-allowed bg-slate-50 shadow-none"
           )}
           {...inputProps}
         />
 
+        {/* Floating Label - Border Cut Style */}
+        {label && (
+          <label
+            htmlFor={name}
+            className={clsx(
+              "absolute left-0 transition-all duration-200 pointer-events-none z-20 px-1 bg-white ml-2 origin-top-left",
+              leftIcon ? "left-10" : "left-4",
+              isFloating 
+                ? "top-0 -translate-y-[50%] scale-[0.85] text-primary font-bold opacity-100" 
+                : "top-1/2 -translate-y-1/2 text-[15px] font-medium text-text-muted",
+              error && "text-red-500",
+              disabled && "opacity-50"
+            )}
+          >
+            {label}
+          </label>
+        )}
+
+        {/* Right Icon / Action */}
         {rightIcon && (
           <button
             type="button"
             onClick={onRightIconClick}
             className={clsx(
-              "absolute right-[16px] top-1/2 -translate-y-1/2 transition-colors duration-200 p-0",
-              error ? "text-red-400" : "text-slate-400 hover:text-text-body"
+              "absolute right-4 top-1/2 -translate-y-1/2 z-10 transition-colors duration-200 p-1.5 rounded-full hover:bg-slate-50",
+              error ? "text-red-400" : "text-slate-400 hover:text-text-main"
             )}
             tabIndex={-1}
-            aria-label="Toggle input action"
           >
             {rightIcon}
           </button>
         )}
       </div>
 
+      {/* Error Message - Below the container to prevent shifting input */}
       {showError && (
-        <motion.p
-          initial={{ opacity: 0, y: -5 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="font-medium text-[12px] text-red-500 ml-1"
-        >
+        <p className="text-[12px] font-semibold text-red-500 px-2 mt-1 animate-in fade-in slide-in-from-top-1 duration-200">
           {error}
-        </motion.p>
+        </p>
       )}
     </div>
   );

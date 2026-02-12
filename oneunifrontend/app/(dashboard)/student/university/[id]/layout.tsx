@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import { UniversityHeader } from "@/components/university/UniversityHeader";
 import { UniversityNav } from "@/components/university/UniversityNav";
 import { universityData } from "@/lib/data/mock-university";

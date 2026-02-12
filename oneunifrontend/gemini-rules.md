@@ -1,131 +1,264 @@
-# OneUni Frontend Development Rules
+OneUni Frontend Development Rules
 
-Before making any changes, thoroughly explore the existing codebase to understand current patterns, components, styling approach, and project structure. Follow existing conventions.
+Before touching any file, explore the existing codebase thoroughly. Understand layout patterns, spacing scale, typography, color usage, and component boundaries.
+Do not introduce new patterns unless absolutely required and approved.
 
----
+This product must feel intentional, calm, and authoritative, not like a hackathon project.
 
-## Design Philosophy
+Design Philosophy
+Core Principles
 
-### Core Principles
-- **Minimal & Purposeful**: Every element must serve a function. Remove anything that doesn't add value.
-- **Modern Sophistication**: Clean lines, generous whitespace, thoughtful spacing. The design should feel premium without being flashy.
-- **Human & Authentic**: Avoid the "AI-generated" aesthetic at all costs. No gradient soup, no generic card layouts, no stock-photo energy.
-- **Consistent Visual Language**: Every page should feel like it belongs to the same family.
+Clarity over cleverness: Users are students and parents. Do not confuse them.
 
-### Typography
-- **Font**: `Inter` exclusively across the entire application
-- Use weight variations purposefully (Regular for body, Medium for labels, Semibold for headings)
-- Establish clear visual hierarchy through size, weight, and color—not through excessive decoration
-- Generous line heights for readability
+Admission-first mindset: Every screen should push users closer to applying or completing their application.
 
-### Visual Design
-- Maintain the existing color palette established in the project
-- Use color with intention—accent colors should guide attention, not scatter it
-- Avoid oversaturated colors; prefer muted, sophisticated tones
-- Ensure proper contrast ratios for accessibility
-- Consistent spacing scale throughout
+Premium but restrained: This is education infrastructure, not a crypto landing page.
 
-### Interactions & Motion
-- Micro-interactions should be subtle and purposeful
-- Smooth transitions with appropriate easing
-- Avoid motion for motion's sake—every animation should communicate something
-- Loading states should be elegant, not distracting
-- Hover states should provide clear feedback without being overwhelming
+Consistency beats novelty: Repetition is good when it builds trust.
 
-### What to Avoid (NO AI SLOP)
-- ❌ Gratuitous gradients, especially purple-to-pink or blue-to-purple
-- ❌ Excessive shadows, glows, or "glassmorphism"
-- ❌ Generic hero sections with abstract blob backgrounds
-- ❌ Overuse of icons or emojis
-- ❌ Cookie-cutter card layouts with rounded corners and shadows
-- ❌ "Tech startup" clichés (floating dashboards, fake 3D elements)
-- ❌ Overly busy backgrounds
-- ❌ Generic stock photography aesthetic
-- ❌ Unnecessary decorative elements
-- ❌ Multiple competing accent colors
-- ❌ Animations that serve no purpose
+If a UI choice does not reduce friction or improve understanding, remove it.
 
----
+Visual Language (Based on Current Screens)
+Layout & Structure
 
-## Coding Rules
+Large, readable hero sections with clear primary CTA
 
-### General Principles
-- Explore the existing codebase first to understand patterns and conventions
-- Follow the established project structure exactly
-- Use existing components and utilities—don't reinvent
-- TypeScript strict mode: No `any` types unless absolutely necessary with justification
-- Keep components focused on single responsibilities
-- DRY principle—reuse, don't repeat
+Left-aligned content blocks for readability
 
-### API Integration
-- All API calls go through the existing service layer (explore to find it)
-- Include `credentials: 'include'` for all fetch requests (cookie-based auth)
-- Read `XSRF-TOKEN` cookie and send as `X-XSRF-TOKEN` header for mutating requests
-- Never store tokens in localStorage/sessionStorage—cookies handle this
-- Type all API requests and responses
+Asymmetric layouts allowed, chaos is not
 
-### State & Error Handling
-- Use the existing state management approach in the codebase
-- Always handle loading, error, and success states
-- User-friendly error messages (not raw API errors)
-- Graceful degradation—the app should not break on API failures
+Generous whitespace, do not compress sections to “fit more”
 
-### What to Avoid (NO AI SLOP CODE)
-- ❌ `console.log` statements in production code
-- ❌ Commented-out code
-- ❌ `any` types without justification
-- ❌ Hardcoded strings (use constants)
-- ❌ Inline styles when the project uses CSS/Tailwind
-- ❌ Copy-pasted code
-- ❌ Over-engineering simple features
-- ❌ God components that do everything
-- ❌ Ignoring TypeScript errors
-- ❌ Mixing concerns (API logic directly in components)
+Cards & Sections
 
----
+Cards exist only when they group related information
 
-## Backend API Reference
+Soft borders or very subtle background contrast only
 
-### Authentication (Cookie-Based)
-The backend uses HTTP-only cookies. Cookies are set automatically on successful auth responses.
+No heavy shadows, no floating nonsense
 
-**POST `/api/auth/register`** — Email/Password Signup
-- Request: `{ email, fullName, password, confirmPassword, role }`
-- Role values: `0` = student, `1` = mentor, `2` = university_representative
-- Response (201): `{ expiresAt, user: { id, email, role } }`
-- Errors: 400 (validation), 409 (user exists), 500 (server error)
+Rounded corners must be consistent project-wide
 
-**POST `/api/auth/login`** — Email/Password Login
-- Request: `{ email, password }`
-- Response (200): `{ expiresAt, user: { id, email, role } }`
-- Errors: 400 (validation), 401 (invalid credentials), 500 (server error)
+If a card can be a simple section, it must be a section.
 
-**GET `/api/auth/me`** — Get Current User (requires auth cookies)
-- Response (200): `{ id, email, role }`
-- Errors: 401 (unauthorized), 404 (user not found)
+Typography
+Font
 
-**POST `/api/auth/logout`** — Logout (requires auth)
-- Clears cookies
-- Response (200): `{ message: "Logged out successfully" }`
+Inter only, no exceptions
 
-**POST `/api/auth/refresh`** — Refresh Token
-- Uses refresh_token cookie automatically
-- Response (200): `{ expiresAt, user }`
+No fallback experiments
 
-### Google OAuth
-**Callback Flow** (handled by backend):
-- Existing user → Sets cookies, redirects to `/login/callback`
-- New user → Sets temporary token, redirects to `/signup/callback`
+Usage Rules
 
-**POST `/api/google-oauth/complete-signup`** — Complete Google Signup
-- Request: `{ role }` (uses temporary token from cookie)
-- Response (201): `{ expiresAt, user: { id, email, role } }`
+Headings are bold, confident, and calm
 
-### User Roles
-- `0` = student
-- `1` = mentor  
-- `2` = university_representative
-- `3` = admin
+Body text is readable, slightly relaxed line-height
 
-### Error Response Format
-All errors return: `{ errors: string[], traceId: string }`
+Labels and helper text are lighter and secondary
+
+Do not stack font weights randomly
+
+Hierarchy must be obvious without color tricks.
+
+Color Usage
+
+Use the existing OneUni palette only
+
+Primary brand color is for:
+
+Main CTAs
+
+Key highlights
+
+Active states
+
+Secondary colors support information, not decoration
+
+Strict No List
+
+❌ Neon or saturated colors
+
+❌ Random accent colors per section
+
+❌ Decorative gradients
+
+❌ Color used just to “make it pop”
+
+If color is doing visual heavy lifting, your layout failed.
+
+Buttons & CTAs
+
+One primary CTA per screen
+
+Secondary actions must visually step back
+
+Button text must be action-oriented and clear
+
+Good: “Start Application”
+
+Bad: “Get Started”, “Continue”, “Explore Magic”
+
+Buttons guide behavior, not emotions.
+
+Icons & Illustrations
+
+Icons are supportive, not decorative
+
+Consistent icon set only
+
+No emoji usage, ever
+
+Illustrations must feel custom and calm, not playful or childish
+
+If an icon does not improve scan-ability, delete it.
+
+Interactions & Motion
+
+Transitions must be subtle and fast
+
+Motion exists only to:
+
+Show cause and effect
+
+Guide attention
+
+Indicate state change
+
+Hard No
+
+❌ Bounce effects
+
+❌ Over-animated hover states
+
+❌ Page-load animations for decoration
+
+❌ Skeletons that flash aggressively
+
+This is not a marketing animation reel.
+
+Content & Copy Rules
+
+Simple English, no jargon
+
+Short sentences
+
+Clear intent
+
+No startup buzzwords
+
+Forbidden Phrases
+
+“Revolutionary”
+
+“Next-generation”
+
+“Empowering”
+
+“Seamless experience” (unless you actually prove it)
+
+The UI should show, not brag.
+
+Coding Rules
+General Engineering Discipline
+
+Follow existing folder structure strictly
+
+Reuse components, do not duplicate logic
+
+One component = one responsibility
+
+Files should be boring and predictable
+
+If your component exceeds reasonable length, split it.
+
+Styling Rules
+
+Follow the current styling approach exactly (Tailwind or CSS modules)
+
+No inline styles unless already used in the codebase
+
+Use spacing utilities consistently
+
+Do not invent new spacing values
+
+Design consistency is more important than personal taste.
+
+TypeScript
+
+Strict mode only
+
+No any unless justified in code comments
+
+All props and API responses must be typed
+
+If TypeScript complains, fix the problem, do not silence it.
+
+State & Data Handling
+
+Centralize API calls in the existing service layer
+
+Components do not talk directly to APIs
+
+Handle loading, empty, error, and success states always
+
+Errors shown to users must be human-readable
+
+A broken state is a broken product.
+
+API Integration Rules
+
+Use cookie-based authentication only
+
+Always include credentials: 'include'
+
+Send X-XSRF-TOKEN for mutating requests
+
+Never store tokens in localStorage or sessionStorage
+
+Security shortcuts are not acceptable.
+
+What to Avoid (NO AI SLOP, NO LAZY CODE)
+Design
+
+❌ Random gradients
+
+❌ Glassmorphism
+
+❌ Overuse of cards
+
+❌ Fancy backgrounds
+
+❌ Visual noise
+
+❌ “Startup hero” clichés
+
+Code
+
+❌ console.log in production
+
+❌ Commented-out code
+
+❌ Copy-paste components
+
+❌ Hardcoded strings
+
+❌ God components
+
+❌ Ignoring TypeScript errors
+
+If it looks rushed, it probably is. Fix it.
+
+Product Mindset Rule (Most Important)
+
+OneUni is not a demo.
+It is an admission system handling real students, real deadlines, and real stress.
+
+Every decision should answer:
+
+Does this reduce confusion?
+
+Does this build trust?
+
+Does this move the user forward?
+
+If not, it does not belong.

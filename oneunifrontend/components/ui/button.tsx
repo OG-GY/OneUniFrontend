@@ -35,18 +35,18 @@ export default function Button({
 
   const variantStyles = {
     primary:
-      "cursor-pointer border border-primary transition hover:shadow-minimal-hover text-white bg-primary hover:bg-primary/90",
+      "cursor-pointer border border-primary text-white bg-primary hover:bg-[#1e2266] transition-colors shadow-sm",
     secondary:
-      "cursor-pointer border border-slate-200 transition hover:shadow-minimal-hover text-primary bg-transparent dark:text-gray-200 dark:hover:text-primary hover:bg-primary/5 hover:text-primary hover:border-primary",
+      "cursor-pointer border border-slate-200 text-primary bg-transparent hover:bg-slate-50 hover:border-slate-300 transition-colors shadow-sm",
     ghost:
-      "cursor-pointer border-0 bg-transparent text-primary transition hover:bg-primary/10",
+      "cursor-pointer border-0 bg-transparent text-primary hover:bg-slate-50 transition-colors",
     destructive:
-      "cursor-pointer border border-red-600 bg-red-700 text-white transition hover:shadow-minimal-hover",
+      "cursor-pointer border border-red-600 bg-red-600 text-white hover:bg-red-700 transition-colors shadow-sm",
     subtle:
-      "cursor-pointer border border-transparent bg-slate-100 text-text-main transition hover:bg-slate-200",
+      "cursor-pointer border border-transparent bg-slate-100 text-text-main hover:bg-slate-200 transition-colors",
     link: "cursor-pointer px-0 py-0 border-0 bg-transparent text-primary underline-offset-4 hover:underline",
     outline:
-      "cursor-pointer border border-slate-200 bg-transparent hover:bg-slate-50 text-text-main transition hover:border-primary hover:text-primary",
+      "cursor-pointer border border-slate-200 bg-transparent hover:bg-slate-50 text-text-main hover:border-slate-300 transition-colors",
   };
 
   return (

@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { motion } from "framer-motion";
 import { ChevronRight } from "lucide-react";
 import Content from "@/components/sections/(Auth)/content-section";
 import RegistrationForm from "@/components/forms/RegistrationForm";
@@ -17,7 +16,6 @@ export default function RegistrationPage() {
     email: "",
     role: "" as Role | "",
     password: "",
-    confirmPassword: "",
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
@@ -56,10 +54,6 @@ export default function RegistrationPage() {
       newErrors.password = "Password must be at least 6 characters";
     }
 
-    if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = "Passwords do not match";
-    }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -76,24 +70,12 @@ export default function RegistrationPage() {
         password: formData.password,
         role: formData.role as Role,
       });
-      // Redirect to redirecting screen on success
       router.push("/redirecting");
     } catch (error: any) {
       if (error.message.includes("exists")) {
         setErrors((prev) => ({ ...prev, email: "User already exists" }));
       } else {
-        // General error handling - validation errors could be mapped here if backend returns them
-        console.error("Registration error:", error);
-        // For now, show a generic error or toast - since no global toast is set up in this context, 
-        // I'll set a form-level error or just log it. 
-        // Ideally we'd use the toast component from components/ui/toast
-        // checking imports... I see toast.tsx in components/ui.
-        // I will just use a generic alert or error state if I can't easily access toast context.
-        // But the requirements said "Inline validation errors".
-        // I'll set a generic error on the email field or a general error state if suitable.
-        // Actually, let's just assume inline errors are sufficient for specific fields.
-        // If it's a 500, maybe alerting is fine for MVP.
-         setErrors((prev) => ({ ...prev, root: error.message || "Something went wrong" }));
+        setErrors((prev) => ({ ...prev, root: error.message || "Something went wrong" }));
       }
     } finally {
       setIsLoading(false);
@@ -101,11 +83,13 @@ export default function RegistrationPage() {
   };
 
   return (
-    <section className="min-h-screen flex flex-col lg:flex-row">
+    <main className="min-h-screen flex flex-col lg:flex-row bg-white">
+      {/* Left Section: Information/Branding */}
       <Content />
-      <div className="flex-1 flex items-center justify-center p-6 sm:p-8 lg:p-12 bg-white w-full min-h-screen">
-        <div className="flex flex-col gap-[32px] w-full max-w-[480px]">
-          {/* Form Content */}
+
+      {/* Right Section: Form */}
+      <div className="flex-1 flex flex-col items-center justify-center p-6 sm:p-12 lg:p-15 overflow-y-auto">
+        <div className="w-full max-w-md flex flex-col gap-0">
           <form onSubmit={handleSubmit} className="w-full flex flex-col gap-8">
             <RegistrationForm
               formData={formData}
@@ -113,37 +97,39 @@ export default function RegistrationPage() {
               onChange={handleChange}
               onRoleSelect={handleRoleSelect as any}
             />
+            
             {errors.root && (
-              <div className="p-3 text-sm text-red-500 bg-red-50 rounded-md">
+              <div className="p-4 text-sm text-red-600 bg-red-50 rounded-lg border border-red-100 animate-in fade-in slide-in-from-top-1 duration-200">
                 {errors.root}
               </div>
             )}
+
             <Button
               type="submit"
               variant="primary"
               disabled={isLoading}
-              className="w-full h-[52px] text-[16px]"
+              className="w-full h-14 text-base font-semibold transition-all duration-200"
               iconRight={!isLoading ? <ChevronRight size={20} /> : undefined}
             >
               {isLoading ? "Creating Account..." : "Create Account"}
             </Button>
           </form>
 
-          {/* Footer */}
-          <div className="flex items-center justify-center gap-[8px] w-full pt-[8px]">
-            <p className="text-[14px] text-text-muted">
+          {/* Footer Navigation */}
+          <div className="flex items-center justify-center gap-2 pt-4 border-t border-slate-100">
+            <p className="text-sm text-text-muted">
               Already have an account?
             </p>
             <button
               type="button"
               onClick={() => router.push("/login")}
-              className="font-medium text-[14px] text-primary hover:underline"
+              className="font-semibold text-sm text-primary hover:text-brand-blue-dark transition-colors"
             >
               Sign in
             </button>
           </div>
         </div>
       </div>
-    </section>
+    </main>
   );
 }
