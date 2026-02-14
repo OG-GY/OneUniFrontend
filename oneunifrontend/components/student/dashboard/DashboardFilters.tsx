@@ -50,21 +50,22 @@ export function DashboardFilters({
   const hasActiveFilters = filters.search || filters.city || filters.program || filters.sortBy;
 
   return (
-    <div className={`bg-white p-4 rounded-2xl border border-slate-200 shadow-sm ${className}`}>
-      <div className="flex flex-col lg:flex-row gap-4">
-        {/* Search Input - Larger width */}
-        <div className="relative flex-[2]">
+    <div className={`bg-white p-2 rounded-2xl border border-slate-200 shadow-sm ${className}`}>
+      <div className="flex flex-col lg:flex-row gap-2">
+        {/* Search Input */}
+        <div className="relative flex-[2] bg-slate-50 border border-slate-200 rounded-xl focus-within:bg-white focus-within:border-primary focus-within:ring-4 focus-within:ring-primary/10 transition-all duration-200">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-          <Input
+          <input
+            type="text"
             placeholder="Search universities..."
             value={filters.search}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => onFilterChange("search", e.target.value)}
-            classname="pl-11 h-11 bg-slate-50 border-slate-200 rounded-xl focus:bg-white transition-all w-full"
+            onChange={(e) => onFilterChange("search", e.target.value)}
+            className="w-full h-12 pl-11 pr-4 bg-transparent border-none outline-none text-sm font-medium text-slate-900 placeholder:text-slate-400"
           />
         </div>
         
         {/* Filters Group */}
-        <div className="flex flex-col sm:flex-row gap-3 flex-[3]">
+        <div className="flex flex-col sm:flex-row gap-2 flex-[3]">
             {/* City Filter */}
             <div className="relative flex-1">
               <MapPin className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none z-10" size={16} />
@@ -72,7 +73,8 @@ export function DashboardFilters({
                 options={cities}
                 value={filters.city}
                 onChange={(e) => onFilterChange("city", e.target.value)}
-                className="pl-10 h-11 bg-slate-50 border-slate-200 rounded-xl focus:bg-white transition-all w-full text-sm"
+                className="pl-10 h-12 bg-slate-50 border-slate-200 rounded-xl focus:bg-white transition-all w-full text-sm font-medium"
+                placeholder="City"
               />
             </div>
 
@@ -83,7 +85,8 @@ export function DashboardFilters({
                 options={programs}
                 value={filters.program}
                 onChange={(e) => onFilterChange("program", e.target.value)}
-                className="pl-10 h-11 bg-slate-50 border-slate-200 rounded-xl focus:bg-white transition-all w-full text-sm"
+                className="pl-10 h-12 bg-slate-50 border-slate-200 rounded-xl focus:bg-white transition-all w-full text-sm font-medium"
+                placeholder="Program"
               />
             </div>
 
@@ -94,7 +97,8 @@ export function DashboardFilters({
                 options={sortOptions}
                 value={filters.sortBy}
                 onChange={(e) => onFilterChange("sortBy", e.target.value)}
-                className="pl-10 h-11 bg-slate-50 border-slate-200 rounded-xl focus:bg-white transition-all w-full text-sm"
+                className="pl-10 h-12 bg-slate-50 border-slate-200 rounded-xl focus:bg-white transition-all w-full text-sm font-medium"
+                placeholder="Sort By"
               />
             </div>
         </div>
@@ -103,7 +107,7 @@ export function DashboardFilters({
         {hasActiveFilters && (
           <button
             onClick={onClearFilters}
-            className="h-11 px-4 rounded-xl text-sm font-medium text-red-600 bg-red-50 hover:bg-red-100 transition-colors flex items-center justify-center gap-2 whitespace-nowrap"
+            className="h-12 px-5 rounded-xl text-sm font-bold text-red-600 bg-red-50 hover:bg-red-100 border border-red-100 transition-colors flex items-center justify-center gap-2 whitespace-nowrap"
           >
             <X size={16} /> <span className="hidden lg:inline">Clear</span>
           </button>

@@ -71,42 +71,12 @@ export default function SignupCallbackPage() {
             transition={{ delay: 0.2 }}
             className="flex flex-col gap-4"
           >
-            <label className="font-medium text-[14px] text-text-body">
-              I want to join as
-            </label>
-            <div className="grid grid-cols-3 gap-4">
-              <RoleSelector
-                roleId="student"
-                label="Student"
-                icon={GraduationCap}
-                isSelected={role === "student"}
-                onRoleSelect={handleRoleSelect as any}
-              />
-              <RoleSelector
-                roleId="mentor"
-                label="Mentor"
-                icon={Briefcase}
-                isSelected={role === "mentor"}
-                onRoleSelect={handleRoleSelect as any}
-              />
-              <RoleSelector
-                roleId="university_representative"
-                label="University"
-                icon={Building2}
-                isSelected={role === "university_representative"}
-                onRoleSelect={handleRoleSelect as any}
-              />
-            </div>
-
-            {error && (
-              <motion.p
-                initial={{ opacity: 0, y: -5 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="text-[13px] text-red-500"
-              >
-                {error}
-              </motion.p>
-            )}
+            <RoleSelector
+              value={role}
+              onChange={handleRoleSelect}
+              error={error}
+              label="I want to join as"
+            />
           </motion.div>
 
           {/* Submit Button */}

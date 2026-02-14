@@ -3,7 +3,7 @@ import clsx from "clsx";
 import { useState } from "react";
 
 type InputProps = {
-  label?: string;
+  label?: React.ReactNode;
   placeholder?: string;
   value?: string;
   name?: string;

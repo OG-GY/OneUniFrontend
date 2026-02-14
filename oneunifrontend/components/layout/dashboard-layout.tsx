@@ -118,7 +118,7 @@ export function DashboardLayout({ children, role = "student" }: DashboardLayoutP
 
         {/* Dynamic Content */}
         <main className="flex-1 overflow-y-auto scrollbar-none pb-12 bg-slate-50/50">
-          <div className="p-6 lg:p-10 max-w-7xl mx-auto w-full">
+          <div className="w-full h-full">
             <motion.div
               key={pathname}
               initial={{ opacity: 0, y: 10 }}

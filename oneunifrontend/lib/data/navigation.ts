@@ -26,13 +26,14 @@ export interface NavItem {
 export const navConfig: Record<string, NavItem[]> = {
   student: [
     { title: "Dashboard", href: "/student", icon: LayoutDashboard },
+    { title: "Explore", href: "/student/explore", icon: School },
     { title: "Applications", href: "/student/applications", icon: FileText },
     { title: "Eligibility", href: "/student/eligibility", icon: ClipboardCheck },
-    { title: "Mentors", href: "/student/mentors", icon: Users },
-    { title: "Documents", href: "/student/documents", icon: FolderOpen },
-    { title: "Schedule", href: "/student/calendar", icon: Calendar },
-    { title: "Messages", href: "/student/messages", icon: MessageSquare },
-    { title: "Financials", href: "/student/payments", icon: CreditCard },
+    { title: "My Sessions", href: "/student/mentors", icon: Users },
+    // { title: "Documents", href: "/student/documents", icon: FolderOpen },
+    // { title: "Schedule", href: "/student/calendar", icon: Calendar },
+    // { title: "Messages", href: "/student/messages", icon: MessageSquare },
+    // { title: "Financials", href: "/student/payments", icon: CreditCard },
   ],
   mentor: [
     { title: "Dashboard", href: "/mentor", icon: LayoutDashboard },

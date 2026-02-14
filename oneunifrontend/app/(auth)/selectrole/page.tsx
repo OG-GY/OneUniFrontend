@@ -8,14 +8,14 @@ import Content from "@/components/sections/(Auth)/content-section";
 import RoleSelector from "@/components/ui/role-selector";
 import Button from "@/components/ui/button";
 
-type Role = "student" | "mentor" | "";
+import type { Role } from "@/lib/api/auth";
 
 export default function SelectRolePage() {
-  const [role, setRole] = useState<Role>("");
+  const [role, setRole] = useState<Role | "">("");
   const [error, setError] = useState("");
   const router = useRouter();
 
-  const handleRoleSelect = (selectedRole: Role) => {
+  const handleRoleSelect = (selectedRole: Role | "") => {
     setRole(selectedRole);
     setError("");
   };
@@ -28,9 +28,8 @@ export default function SelectRolePage() {
     
     if (role === "student") {
       router.push("/onboarding/student");
-    } else {
-      // For now, mentor onboarding isn't implemented
-      console.log("Selected role:", role);
+    } else if (role === "mentor") {
+      router.push("/onboarding/mentor");
     }
   };
 
@@ -61,18 +60,13 @@ export default function SelectRolePage() {
           </div>
 
           <div className="flex flex-col gap-6">
-            <div className="flex gap-4">
-              <div className="flex-1">
-                <RoleSelector
-                  roleId="mentor"
-                  label="Mentor"
-                  icon={Briefcase}
-                  isSelected={role === "mentor"}
-                  onRoleSelect={handleRoleSelect}
-                />
-              </div>
-            </div>
-            
+            <RoleSelector
+              value={role}
+              onChange={handleRoleSelect}
+              error={error}
+              label="Select your role"
+            />
+
             {error && (
               <motion.p
                 initial={{ opacity: 0, y: -5 }}

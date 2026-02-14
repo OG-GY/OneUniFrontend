@@ -21,13 +21,11 @@ If a UI choice does not reduce friction or improve understanding, remove it.
 Visual Language (Based on Current Screens)
 Layout & Structure
 
-Large, readable hero sections with clear primary CTA
-
-Left-aligned content blocks for readability
-
-Asymmetric layouts allowed, chaos is not
-
-Generous whitespace, do not compress sections to “fit more”
+- **Flush Workspace**: The main content area must be flush with the Sidebar and Top Header. Do not use global padding (`p-6`, etc.) or `max-w-7xl` on the main container. Let individual sections handle their internal alignment.
+- **Full-Width Immersion**: Pages should feel like a "well" or "app canvas" rather than a document.
+- **Large, Readable Hero Sections**: Use cards with vibrant gradients and clear primary CTAs for dashboard entry points.
+- **Left-Aligned Content Blocks**: Maintain readability while allowing for asymmetric layouts in dashboards.
+- **Generous Inter-Section Whitespace**: Use `space-y-8` or `gap-12` between major blocks to prevent visual clutter.
 
 Cards & Sections
 
