@@ -25,7 +25,7 @@ export default function StudentOverviewPage() {
   }
 
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col gap-8 pb-20 px-6 lg:px-10 py-8">
       {/* Welcome Section */}
       <motion.div 
         initial={{ opacity: 0, y: 20 }}

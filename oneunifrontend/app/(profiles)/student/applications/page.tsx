@@ -34,7 +34,7 @@ export default function ApplicationsPage() {
     : MOCK_APPLICATIONS.filter(app => app.status === activeTab);
 
   return (
-    <div className="flex flex-col gap-8 min-h-screen bg-slate-50 p-4 md:p-8">
+    <div className="flex flex-col gap-8 min-h-screen bg-slate-50 pb-20 px-6 lg:px-10 py-8">
       <div className="flex flex-col gap-2">
         <h1 className="text-3xl font-bold text-text-main">My Applications</h1>
         <p className="text-text-muted">Manage and track your university applications.</p>

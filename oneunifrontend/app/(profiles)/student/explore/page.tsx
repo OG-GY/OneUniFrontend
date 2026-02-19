@@ -14,7 +14,7 @@ export default function ExplorePage() {
   const [activeTab, setActiveTab] = useState<TabType>("universities");
 
   return (
-    <div className="flex flex-col gap-8 min-h-screen">
+    <div className="flex flex-col gap-8 min-h-screen pb-20 px-6 lg:px-10 py-8">
       <div>
         
 {/*         

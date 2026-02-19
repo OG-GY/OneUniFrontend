@@ -7,7 +7,7 @@ import Button from "@/components/ui/button";
 
 export default function UniversityOverviewPage() {
   return (
-    <div className="flex flex-col gap-12 pb-12">
+    <div className="flex flex-col gap-12 pb-20 px-6 lg:px-10 py-8">
       
       {/* Hero / Overview Section */}
       <section className="w-full bg-white border-b border-slate-200">

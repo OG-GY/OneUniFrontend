@@ -47,7 +47,7 @@ export default function MentorsPage() {
   });
 
   return (
-    <div className="min-h-screen bg-slate-50 p-4 md:p-8 font-sans">
+    <div className="min-h-screen bg-slate-50 pb-20 px-6 lg:px-10 py-8 font-sans">
       <div className="max-w-7xl mx-auto">
         
         {/* Main Tabs */}

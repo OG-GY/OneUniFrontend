@@ -167,7 +167,7 @@ export default function EligibilityPage() {
   };
 
   return (
-    <div className="flex flex-col gap-6 min-h-screen">
+    <div className="flex flex-col gap-6 min-h-screen pb-20 px-6 lg:px-10 py-8">
       {/* Header */}
       <div className="flex flex-col gap-1">
         <h1 className="text-3xl font-bold text-text-main">Eligibility Checker</h1>
