@@ -11,6 +11,7 @@ interface ProgramHeaderProps {
   description: string;
   duration: string;
   creditHours: number;
+  onApply?: () => void;
 }
 
 export function ProgramHeader({
@@ -20,6 +21,7 @@ export function ProgramHeader({
   description,
   duration,
   creditHours,
+  onApply,
 }: ProgramHeaderProps) {
   return (
     <div className="bg-white rounded-3xl border border-slate-200 p-8 mb-8 shadow-sm">
@@ -67,7 +69,10 @@ export function ProgramHeader({
         </div>
 
         <div className="flex flex-col gap-3 min-w-[240px]">
-          <Button className="w-full py-6 text-lg font-bold shadow-lg shadow-primary/20">
+          <Button 
+            onClick={onApply}
+            className="w-full py-6 text-lg font-bold shadow-lg shadow-primary/20"
+          >
             Apply Now
           </Button>
           <Button variant="outline" className="w-full py-6 text-lg font-bold">

@@ -22,14 +22,17 @@ import { ProgramTabs } from "@/components/university/ProgramTabs";
 import { ProgramSection } from "@/components/university/ProgramSection";
 import { CurriculumList } from "@/components/university/CurriculumList";
 import { FeeCard } from "@/components/university/FeeCard";
+import { ApplicationConfirmationDrawer } from "@/components/university/ApplicationConfirmationDrawer";
 
 export default function ProgramDetailsPage() {
   const params = useParams();
   const router = useRouter();
   const programId = params.programId as string;
   const program = getProgramDetails(programId);
+  const universityId = params.id as string; // Standardized university identifier
   
   const [activeTab, setActiveTab] = useState<"overview" | "curriculum" | "eligibility" | "fees">("overview");
+  const [isApplicationDrawerOpen, setIsApplicationDrawerOpen] = useState(false);
 
   const tabs = [
     { id: "overview", label: "Overview", icon: FileText },
@@ -41,13 +44,13 @@ export default function ProgramDetailsPage() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Back Button */}
-      <button 
+      {/* <button 
         onClick={() => router.back()}
         className="flex items-center gap-2 text-text-muted hover:text-primary transition-colors mb-8 group"
       >
         <ChevronLeft size={20} className="transition-transform group-hover:-translate-x-1" />
         <span className="font-medium">Back to Programs</span>
-      </button>
+      </button> */}
 
       {/* Header Section */}
       <ProgramHeader 
@@ -57,6 +60,15 @@ export default function ProgramDetailsPage() {
         description={program.description}
         duration={program.duration}
         creditHours={program.creditHours}
+        onApply={() => setIsApplicationDrawerOpen(true)}
+      />
+
+      {/* Confirmation Drawer */}
+      <ApplicationConfirmationDrawer 
+        isOpen={isApplicationDrawerOpen}
+        onClose={() => setIsApplicationDrawerOpen(false)}
+        programName={program.name}
+        universityName={universityId.toUpperCase()} // Using ID as name proxy for now
       />
 
       {/* Content Tabs */}
