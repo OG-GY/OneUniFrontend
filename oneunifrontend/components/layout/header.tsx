@@ -10,9 +10,9 @@ import { motion, AnimatePresence, useScroll, useMotionValueEvent } from "framer-
 import { cn } from "@/lib/utils"
 
 const NAV_ITEMS = [
-  { id: 'programs', label: 'Programs', href: '/programs' },
-  { id: 'admissions', label: 'Admissions', href: '/admissions' },
-  { id: 'campus-life', label: 'Campus Life', href: '/campus-life' },
+  { id: 'universities', label: 'Universities', href: '/explore' },
+  { id: 'admissions', label: 'Admissions', href: '/explore' },
+  { id: 'campus-life', label: 'Campus Life', href: '/explore' },
   { id: 'research', label: 'Research', href: '/research' },
 ]
 

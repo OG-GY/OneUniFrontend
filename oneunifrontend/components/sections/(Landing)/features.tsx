@@ -54,7 +54,7 @@ export default function Features() {
             <p className="text-lg text-slate-600 mb-8 max-w-md">
               We've redesigned the university experience from the ground up to be student-centric, digital-first, and incredibly simple.
             </p>
-            <a href="#" className="text-primary font-semibold hover:text-primary/80 transition flex items-center gap-2 group">
+            <a href="/explore" className="text-primary font-semibold hover:text-primary/80 transition flex items-center gap-2 group">
               Learn about our platform 
               <span className="transform group-hover:translate-x-1 transition-transform">→</span>
             </a>
