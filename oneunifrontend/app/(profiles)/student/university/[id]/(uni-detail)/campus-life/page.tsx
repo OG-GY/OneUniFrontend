@@ -5,11 +5,15 @@ import {
   Home, Dumbbell, Stethoscope, Bus, Utensils, Mic2, FlaskConical, Library,
   Wifi, ShieldCheck
 } from "lucide-react";
-import { universityData } from "@/lib/data/mock-university";
+import { universities } from "@/lib/mockData";
 import Button from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useParams } from "next/navigation";
 
 export default function UniversityCampusLifePage() {
+  const params = useParams();
+  const universityData = universities.find((item) => item.id === params.id);
+  if (!universityData) return <div className="p-8">Not found</div>;
   
   const getFacilityIcon = (name: string) => {
     const lowerName = name.toLowerCase();

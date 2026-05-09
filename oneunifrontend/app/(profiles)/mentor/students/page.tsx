@@ -16,64 +16,26 @@ import {
 } from 'lucide-react';
 import Button from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-
-// Enhanced mock student data
-const MOCK_STUDENTS = [
-  {
-    id: 'u3',
-    fullName: 'Fatima Noor',
-    email: 'fatima@example.com',
-    profilePicture: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-1.2.1&auto=format&fit=crop&w=256&q=80',
-    university: 'NUST',
-    major: 'Computer Science',
-    totalSessions: 5,
-    lastSession: '2026-02-10',
-    status: 'Active',
-    progress: 75
-  },
-  {
-    id: 'u6',
-    fullName: 'Ahmed Hassan',
-    email: 'ahmed.h@example.com',
-    profilePicture: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&auto=format&fit=crop&w=256&q=80',
-    university: 'LUMS',
-    major: 'Economics',
-    totalSessions: 3,
-    lastSession: '2026-02-05',
-    status: 'Active',
-    progress: 40
-  },
-  {
-    id: 'u7',
-    fullName: 'Zainab Qureshi',
-    email: 'z.qureshi@example.com',
-    profilePicture: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?ixlib=rb-1.2.1&auto=format&fit=crop&w=256&q=80',
-    university: 'FAST ISB',
-    major: 'Software Engineering',
-    totalSessions: 1,
-    lastSession: '2026-02-12',
-    status: 'New',
-    progress: 10
-  },
-  {
-    id: 'u8',
-    fullName: 'Bilal Khan',
-    email: 'bilal.k@example.com',
-    profilePicture: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&auto=format&fit=crop&w=256&q=80',
-    university: 'GIKI',
-    major: 'Mechanical Engineering',
-    totalSessions: 8,
-    lastSession: '2026-01-15',
-    status: 'Completed',
-    progress: 100
-  }
-];
+import { students } from '@/lib/mockData';
 
 export default function MentorStudentsPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
 
-  const filteredStudents = MOCK_STUDENTS.filter(student => {
+  const roster = students.map((student, index) => ({
+    id: student.id,
+    fullName: student.fullName,
+    email: student.email,
+    profilePicture: student.profilePictureUrl,
+    university: student.interestedCity,
+    major: student.interests[0] || "General",
+    totalSessions: 2 + index,
+    lastSession: "2026-02-10",
+    status: index === 0 ? "Active" : index === 1 ? "New" : "Completed",
+    progress: student.completionPercentage,
+  }));
+
+  const filteredStudents = roster.filter(student => {
     const matchesSearch = student.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          student.university.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === 'All' || student.status === statusFilter;
@@ -86,7 +48,7 @@ export default function MentorStudentsPage() {
       <div className="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-8">
         <div className="flex flex-col gap-1">
           <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Student Roster</h1>
-          <p className="text-slate-500 font-medium text-sm">You have {MOCK_STUDENTS.length} active mentees across 4 universities.</p>
+          <p className="text-slate-500 font-medium text-sm">You have {roster.length} active mentees across multiple universities.</p>
         </div>
 
         <div className="flex items-center gap-6">

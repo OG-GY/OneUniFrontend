@@ -9,14 +9,14 @@ interface UniversityHeaderProps {
     location: string;
     website: string;
     ranking: number;
-    established: string;
+    established: string | number;
     vcName: string;
     contact: {
       phone: string;
       email: string;
     };
     fees?: {
-      semester: string;
+      semester: string | number;
     };
   };
 }
@@ -73,7 +73,9 @@ export function UniversityHeader({ data }: UniversityHeaderProps) {
                         <div className="p-1.5 bg-secondary/10 text-secondary rounded-md">
                             <DollarSign size={18} />
                         </div>
-                        <span className="text-2xl font-bold text-text-main">{data.fees.semester}</span>
+                        <span className="text-2xl font-bold text-text-main">
+                          {typeof data.fees.semester === "number" ? `PKR ${data.fees.semester.toLocaleString()}` : data.fees.semester}
+                        </span>
                     </div>
                 </div>
             )}

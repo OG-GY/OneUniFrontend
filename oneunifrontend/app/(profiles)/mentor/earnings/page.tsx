@@ -18,18 +18,9 @@ import {
   CheckCircle2,
   Clock
 } from 'lucide-react';
-import { MENTOR_STATS, MOCK_SESSIONS } from '@/lib/dummy-data';
+import { earnings } from '@/lib/mockData';
 import Button from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-
-// Mock Transaction Data
-const MOCK_TRANSACTIONS = [
-  { id: 'tx1', type: 'Session', student: 'Fatima Noor', amount: 2500, date: '2026-01-28', status: 'processed', method: 'OneUni Wallet' },
-  { id: 'tx2', type: 'Session', student: 'Ahmed Hassan', amount: 3000, date: '2026-01-25', status: 'processed', method: 'OneUni Wallet' },
-  { id: 'tx3', type: 'Withdrawal', student: 'Bank Transfer (HBL)', amount: -10000, date: '2026-01-20', status: 'completed', method: 'Bank Transfer' },
-  { id: 'tx4', type: 'Session', student: 'Zainab Qureshi', amount: 2000, date: '2026-01-18', status: 'processed', method: 'OneUni Wallet' },
-  { id: 'tx5', type: 'Session', student: 'Bilal Khan', amount: 1500, date: '2026-01-15', status: 'processed', method: 'OneUni Wallet' },
-];
 
 export default function MentorEarningsPage() {
   const [activeRange, setActiveRange] = useState('This Month');
@@ -72,7 +63,7 @@ export default function MentorEarningsPage() {
                    </div>
                    <div className="space-y-1">
                         <p className="text-[13px] font-medium text-blue-200/60 uppercase tracking-widest leading-none">Total Net Profit</p>
-                        <h2 className="text-5xl font-bold tracking-tight">Rs. {MENTOR_STATS.earningsThisMonth.toLocaleString()}</h2>
+                        <h2 className="text-5xl font-bold tracking-tight">Rs. {earnings.earningsThisMonth.toLocaleString()}</h2>
                    </div>
                 </div>
 
@@ -158,7 +149,7 @@ export default function MentorEarningsPage() {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100">
-                            {MOCK_TRANSACTIONS.map((tx) => (
+                            {earnings.transactions.map((tx) => (
                                 <tr key={tx.id} className="group hover:bg-slate-50/50 transition-colors">
                                     <td className="px-8 py-5">
                                         <div className="flex items-center gap-4">

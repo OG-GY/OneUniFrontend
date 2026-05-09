@@ -4,16 +4,8 @@ import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { DashboardFilters } from "@/components/student/dashboard/DashboardFilters";
 import { UniversityCard } from "@/components/student/dashboard/UniversityCard";
-import { universityData } from "@/lib/data/mock-university";
+import { universities } from "@/lib/mockData";
 import { listAnimations } from "@/lib/config/animation";
-
-// Mocking multiple universities by reusing NUST data with tweaks
-const universities = [
-  universityData,
-  { ...universityData, name: "COMSATS University", logo: "/Logo/OneUniN.png", location: "Islamabad", fees: { ...universityData.fees, semester: "PKR 120,000" } },
-  { ...universityData, name: "LUMS", logo: "/Logo/OneUniL.png", location: "Lahore", fees: { ...universityData.fees, semester: "PKR 450,000" } },
-  { ...universityData, name: "FAST NUCES", logo: "/Logo/OneUniN.png", location: "Islamabad", fees: { ...universityData.fees, semester: "PKR 160,000" } },
-];
 
 export function UniversityTab() {
   const [filters, setFilters] = useState({
@@ -37,8 +29,9 @@ export function UniversityTab() {
   };
 
   // Helper to parse fee string to number
-  const parseFee = (feeString: string) => {
-    return parseInt(feeString.replace(/[^0-9]/g, "")) || 0;
+  const parseFee = (feeValue: number | string) => {
+    if (typeof feeValue === "number") return feeValue;
+    return parseInt(String(feeValue).replace(/[^0-9]/g, "")) || 0;
   };
 
   // Filter logic
@@ -49,7 +42,7 @@ export function UniversityTab() {
         return false;
       }
       // City
-      if (filters.city && !uni.location.includes(filters.city)) {
+      if (filters.city && !uni.city?.toLowerCase().includes(filters.city.toLowerCase())) {
         return false;
       }
       // Program Category
@@ -110,19 +103,19 @@ export function UniversityTab() {
             <AnimatePresence mode="popLayout">
               {filteredUniversities.map((uni, index) => (
                 <motion.div
-                  key={uni.name}
+                  key={uni.id}
                   {...listAnimations.card}
                 >
                   <UniversityCard
-                    id={uni.name.toLowerCase().replace(/\s+/g, "-")}
+                    id={uni.id}
                     name={uni.name}
                     logo={uni.logo}
                     image={uni.subCampuses[0]?.image} // Using first campus image as main image
                     location={uni.location}
                     ranking={uni.ranking}
-                    established={uni.established}
+                    established={String(uni.established)}
                     programCount={uni.departments.reduce((acc, dept) => acc + dept.programs.length, 0)}
-                    minFee={uni.fees.semester}
+                    minFee={`PKR ${uni.fees.semester.toLocaleString()}`}
                     campuses={uni.subCampuses.length}
                   />
                 </motion.div>

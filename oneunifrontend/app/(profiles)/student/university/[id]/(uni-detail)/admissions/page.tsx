@@ -2,11 +2,16 @@
 
 import { FileText, Wallet, Trophy, CheckCircle2, Calendar, ArrowRight, Download, GraduationCap, BookOpen, PenTool, AlertCircle, FileCheck, ClipboardCheck, FileSignature } from "lucide-react";
 import { FeeStructure } from "@/components/university/FeeStructure";
-import { universityData } from "@/lib/data/mock-university";
+import { universities } from "@/lib/mockData";
 import Button from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useParams } from "next/navigation";
 
 export default function UniversityAdmissionsPage() {
+  const params = useParams();
+  const universityData = universities.find((item) => item.id === params.id);
+  if (!universityData) return <div className="p-8">Not found</div>;
+
   return (
     <div className="space-y-8 max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
       
@@ -14,7 +19,7 @@ export default function UniversityAdmissionsPage() {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-200 pb-6">
         <div>
           <h2 className="text-3xl font-bold text-text-main">Admissions & Aid</h2>
-          <p className="text-text-body mt-1">Everything you need to know about applying to NUST.</p>
+          <p className="text-text-body mt-1">Everything you need to know about applying to {universityData.shortName}.</p>
         </div>
         <div className="flex gap-3">
           <Button variant="outline" className="gap-2">
@@ -120,7 +125,7 @@ export default function UniversityAdmissionsPage() {
                     <div className="w-14 h-14 rounded-full bg-secondary/10 text-secondary flex items-center justify-center mb-1 group-hover:bg-secondary group-hover:text-white transition-colors">
                       <FileSignature size={28} />
                     </div>
-                    <span className="font-bold text-text-main text-lg">{test}</span>
+                    <span className="font-bold text-text-main text-lg">{test.name}</span>
                     <span className="text-xs text-text-muted bg-slate-100 px-3 py-1 rounded-full font-medium">Accepted Test</span>
                   </div>
                 ))}
@@ -214,7 +219,7 @@ export default function UniversityAdmissionsPage() {
                   </div>
                   <div>
                     <p className="text-xs text-blue-200">Email Us</p>
-                    <p className="font-medium text-sm">admissions@nust.edu.pk</p>
+                    <p className="font-medium text-sm">{universityData.contact.email}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3 p-3 bg-white/5 rounded-lg border border-white/10 hover:bg-white/10 transition-colors">
@@ -223,7 +228,7 @@ export default function UniversityAdmissionsPage() {
                   </div>
                   <div>
                     <p className="text-xs text-blue-200">Call Us</p>
-                    <p className="font-medium text-sm">+92-51-9085-0000</p>
+                    <p className="font-medium text-sm">{universityData.contact.phone}</p>
                   </div>
                 </div>
               </div>

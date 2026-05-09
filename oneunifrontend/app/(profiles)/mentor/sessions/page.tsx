@@ -14,24 +14,23 @@ import {
   X,
   CheckCircle2
 } from 'lucide-react';
-import { MOCK_SESSIONS } from '@/lib/dummy-data';
+import { mentors, sessions } from '@/lib/mockData';
+import { getCurrentUser } from '@/lib/auth';
 import Button from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
 export default function MentorSessionsPage() {
+  const currentUser = getCurrentUser();
   const [activeTab, setActiveTab] = useState<'calendar' | 'upcoming' | 'history'>('calendar');
-  
-  const upcomingSessions = MOCK_SESSIONS.filter(s => s.status === 'scheduled');
-  const pastSessions = MOCK_SESSIONS.filter(s => s.status === 'completed' || s.status === 'cancelled');
-
-  // Simple Availability Mock
-  const availability = [
-    { day: 'Monday', slots: ['09:00 AM - 11:00 AM', '02:00 PM - 04:00 PM'] },
-    { day: 'Tuesday', slots: ['10:00 AM - 12:00 PM'] },
-    { day: 'Wednesday', slots: ['09:00 AM - 11:00 AM', '03:00 PM - 05:00 PM'] },
-    { day: 'Thursday', slots: ['02:00 PM - 05:00 PM'] },
-    { day: 'Friday', slots: ['09:00 AM - 12:00 PM'] },
-  ];
+  const currentMentor = mentors.find(
+    (mentor) => mentor.email.toLowerCase() === (currentUser?.email || "").toLowerCase()
+  ) || mentors[0];
+  const mentorSessions = sessions.filter((session) => session.mentor.id === currentMentor.id);
+  const upcomingSessions = mentorSessions.filter((session) => session.status === "scheduled");
+  const pastSessions = mentorSessions.filter(
+    (session) => session.status === "completed" || session.status === "cancelled"
+  );
+  const availability = currentMentor.availability;
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 max-w-full px-6 lg:px-10 py-8">

@@ -16,68 +16,19 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Button from '@/components/ui/button';
-
-// Mock Reviews Data
-const MOCK_REVIEWS = [
-  {
-    id: 'rev1',
-    student: {
-      name: 'Fatima Noor',
-      avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-1.2.1&auto=format&fit=crop&w=256&q=80',
-      university: 'NUST'
-    },
-    rating: 5,
-    comment: 'Exceptional guidance! The resume review session was a game-changer for my application. Highly recommend for any CS aspirant.',
-    date: '2026-01-28',
-    sessionTopic: 'Resume Review & Career Roadmap'
-  },
-  {
-    id: 'rev2',
-    student: {
-      name: 'Ahmed Hassan',
-      avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&auto=format&fit=crop&w=256&q=80',
-      university: 'LUMS'
-    },
-    rating: 4,
-    comment: 'Very helpful session on LCAT prep. Great tips on time management and specific section strategies.',
-    date: '2026-01-20',
-    sessionTopic: 'LCAT Preparation Strategy'
-  },
-  {
-    id: 'rev3',
-    student: {
-      name: 'Zainab Qureshi',
-      avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?ixlib=rb-1.2.1&auto=format&fit=crop&w=256&q=80',
-      university: 'FAST ISB'
-    },
-    rating: 5,
-    comment: 'The mock interview was incredibly realistic. The feedback I received helped me build confidence for the actual University interview.',
-    date: '2026-01-15',
-    sessionTopic: 'Mock Interview Practice'
-  },
-  {
-    id: 'rev4',
-    student: {
-      name: 'Bilal Khan',
-      avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&auto=format&fit=crop&w=256&q=80',
-      university: 'GIKI'
-    },
-    rating: 5,
-    comment: 'Clear, concise, and professional. OneUni mentors are truly top-tier. Helped me understand the engineering roadmap perfectly.',
-    date: '2026-01-05',
-    sessionTopic: 'Engineering Discipline Selection'
-  }
-];
+import { reviews } from '@/lib/mockData';
 
 export default function MentorReviewsPage() {
   const [filterRating, setFilterRating] = useState('all');
 
-  const filteredReviews = filterRating === 'all' 
-    ? MOCK_REVIEWS 
-    : MOCK_REVIEWS.filter(r => r.rating === parseInt(filterRating));
+  const filteredReviews = filterRating === 'all'
+    ? reviews
+    : reviews.filter(r => r.rating === parseInt(filterRating));
 
-  const averageRating = 4.8;
-  const totalReviews = 45;
+  const averageRating = Number(
+    (reviews.reduce((sum, review) => sum + review.rating, 0) / (reviews.length || 1)).toFixed(1)
+  );
+  const totalReviews = reviews.length;
 
   return (
     <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700 px-6 lg:px-10 py-8">
@@ -147,7 +98,7 @@ export default function MentorReviewsPage() {
         <div className="p-8 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
           <div className="flex items-center gap-3">
               <h2 className="text-xl font-bold text-slate-900 tracking-tight">Student Feedback</h2>
-              <span className="text-[11px] font-black bg-slate-100 text-slate-500 px-3 py-1 rounded-lg uppercase tracking-widest">{MOCK_REVIEWS.length} New Feedback</span>
+              <span className="text-[11px] font-black bg-slate-100 text-slate-500 px-3 py-1 rounded-lg uppercase tracking-widest">{reviews.length} New Feedback</span>
           </div>
 
           <div className="flex items-center gap-4">

@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Button from '@/components/ui/button';
 import { MentorCard } from '@/components/cards/mentor-card';
-import { MOCK_MENTORS } from '@/lib/dummy-data';
+import { mentors } from '@/lib/mockData';
 import { Search, Filter, SlidersHorizontal, MapPin } from 'lucide-react';
 import Footer from '@/components/layout/footer';
 import Header from '@/components/layout/header';
@@ -20,11 +20,22 @@ export default function MentorsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   
   // Simple filter logic for demo
-  const filteredMentors = MOCK_MENTORS.filter(mentor => 
+  const filteredMentors = mentors.filter(mentor => 
     mentor.user.fullName.toLowerCase().includes(searchQuery.toLowerCase()) ||
     mentor.specializations.some(spec => spec.toLowerCase().includes(searchQuery.toLowerCase())) ||
     mentor.currentInstitution.toLowerCase().includes(searchQuery.toLowerCase())
   );
+  const mentorCards = filteredMentors.map((mentor) => ({
+    mentorId: mentor.id,
+    user: mentor.user,
+    designation: mentor.designation,
+    currentInstitution: mentor.currentInstitution,
+    specializations: mentor.specializations,
+    bio: mentor.bio,
+    hourlyRate: mentor.hourlyRate,
+    averageRating: mentor.averageRating,
+    totalSessions: mentor.totalSessions,
+  }));
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
@@ -100,7 +111,7 @@ export default function MentorsPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {filteredMentors.map((mentor) => (
+            {mentorCards.map((mentor) => (
               <div key={mentor.mentorId} className="h-full">
                 <MentorCard mentor={mentor} />
               </div>

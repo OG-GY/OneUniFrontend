@@ -15,71 +15,13 @@ import {
   User,
   Info
 } from 'lucide-react';
-import { MOCK_USERS } from '@/lib/dummy-data';
+import { conversations } from '@/lib/mockData';
 import Button from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
-// Mock Conversations Data
-const MOCK_CONVERSATIONS = [
-  {
-    id: 'c1',
-    student: {
-      id: 'u3',
-      name: 'Fatima Noor',
-      avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-1.2.1&auto=format&fit=crop&w=256&q=80',
-      university: 'NUST',
-      status: 'online',
-      major: 'Computer Science'
-    },
-    lastMessage: 'Thank you for the session yesterday! It was very helpful.',
-    timestamp: '10:24 AM',
-    unreadCount: 0,
-    isActive: true
-  },
-  {
-    id: 'c2',
-    student: {
-      id: 'u6',
-      name: 'Ahmed Hassan',
-      avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&auto=format&fit=crop&w=256&q=80',
-      university: 'LUMS',
-      status: 'offline',
-      major: 'Economics'
-    },
-    lastMessage: 'Could we reschedule our Friday meeting to Saturday?',
-    timestamp: 'Yesterday',
-    unreadCount: 2,
-    isActive: false
-  },
-  {
-    id: 'c3',
-    student: {
-      id: 'u7',
-      name: 'Zainab Qureshi',
-      avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?ixlib=rb-1.2.1&auto=format&fit=crop&w=256&q=80',
-      university: 'FAST ISB',
-      status: 'online',
-      major: 'Software Engineering'
-    },
-    lastMessage: 'I have uploaded my revised resume for your review.',
-    timestamp: 'Jan 28',
-    unreadCount: 0,
-    isActive: false
-  }
-];
-
-// Mock Message History
-const MOCK_MESSAGES = [
-  { id: 'm1', sender: 'student', text: 'Hi Mentor! I wanted to follow up on the points we discussed regarding my NUST application.', timestamp: '09:15 AM' },
-  { id: 'm2', sender: 'mentor', text: 'Hello Fatima! Sure, happy to help. Which specific section are you looking at?', timestamp: '09:20 AM' },
-  { id: 'm3', sender: 'student', text: 'Mostly the personal statement. I feel it is a bit too technical at the moment.', timestamp: '09:22 AM' },
-  { id: 'm4', sender: 'mentor', text: 'That is a common concern. You should try to balance technical achievement with your personal motivation.', timestamp: '09:25 AM' },
-  { id: 'm5', sender: 'student', text: 'Thank you for the session yesterday! It was very helpful.', timestamp: '10:24 AM' },
-];
-
 export default function MentorMessagesPage() {
-  const [selectedConv, setSelectedConv] = useState(MOCK_CONVERSATIONS[0]);
-  const [messages, setMessages] = useState(MOCK_MESSAGES);
+  const [selectedConv, setSelectedConv] = useState(conversations[0]);
+  const [messages, setMessages] = useState(conversations[0]?.messages || []);
   const [newMessage, setNewMessage] = useState('');
   const chatEndRef = useRef<HTMLDivElement>(null);
 
@@ -102,6 +44,11 @@ export default function MentorMessagesPage() {
     setNewMessage('');
   };
 
+  const handleSelectConversation = (conversation: (typeof conversations)[number]) => {
+    setSelectedConv(conversation);
+    setMessages(conversation.messages || []);
+  };
+
   return (
     <div className="h-[calc(100vh-160px)] flex flex-col xl:flex-row gap-6 animate-in fade-in duration-700 px-6 lg:px-10 pt-8 pb-4">
       
@@ -122,10 +69,10 @@ export default function MentorMessagesPage() {
 
         {/* Conversation List */}
         <div className="flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar">
-          {MOCK_CONVERSATIONS.map((conv) => (
+          {conversations.map((conv) => (
             <button
               key={conv.id}
-              onClick={() => setSelectedConv(conv)}
+              onClick={() => handleSelectConversation(conv)}
               className={cn(
                 "w-full p-5 flex items-start gap-4 transition-all border-b border-slate-50 last:border-0 relative",
                 selectedConv.id === conv.id 

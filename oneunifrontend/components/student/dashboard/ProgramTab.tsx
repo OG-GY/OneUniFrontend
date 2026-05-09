@@ -4,31 +4,9 @@ import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { DashboardFilters } from "@/components/student/dashboard/DashboardFilters";
 import { ProgramCard } from "@/components/student/dashboard/ProgramCard";
-import { universityData } from "@/lib/data/mock-university";
+import { programs } from "@/lib/mockData";
 import { listAnimations } from "@/lib/config/animation";
-
-// Mocking multiple universities (same as in UniversityTab)
-const universities = [
-  universityData,
-  { ...universityData, name: "COMSATS University", logo: "/Logo/OneUniN.png", location: "Islamabad", fees: { ...universityData.fees, semester: "PKR 120,000" } },
-  { ...universityData, name: "LUMS", logo: "/Logo/OneUniL.png", location: "Lahore", fees: { ...universityData.fees, semester: "PKR 450,000" } },
-  { ...universityData, name: "FAST NUCES", logo: "/Logo/OneUniN.png", location: "Islamabad", fees: { ...universityData.fees, semester: "PKR 160,000" } },
-];
-
-// Flatten programs
-const allPrograms = universities.flatMap(uni => 
-  uni.departments.flatMap(dept => 
-    dept.programs.map(prog => ({
-      ...prog,
-      universityName: uni.name,
-      universityLogo: uni.logo,
-      universityId: uni.name.toLowerCase().replace(/\s+/g, "-"),
-      location: uni.location,
-      fee: uni.fees.semester, // Using semester fee as proxy
-      ranking: uni.ranking
-    }))
-  )
-);
+const allPrograms = programs;
 
 export function ProgramTab() {
   const [filters, setFilters] = useState({
@@ -51,8 +29,9 @@ export function ProgramTab() {
     });
   };
 
-  const parseFee = (feeString: string) => {
-    return parseInt(feeString.replace(/[^0-9]/g, "")) || 0;
+  const parseFee = (feeValue: number | string) => {
+    if (typeof feeValue === "number") return feeValue;
+    return parseInt(String(feeValue).replace(/[^0-9]/g, "")) || 0;
   };
 
   const filteredPrograms = useMemo(() => {
@@ -64,7 +43,7 @@ export function ProgramTab() {
         return false;
       }
       // City
-      if (filters.city && !prog.location.includes(filters.city)) {
+      if (filters.city && !prog.location.toLowerCase().includes(filters.city.toLowerCase())) {
         return false;
       }
       // Program Category (Name match)
@@ -131,7 +110,7 @@ export function ProgramTab() {
                     location={prog.location}
                     duration={prog.duration}
                     type={prog.type}
-                    fee={prog.fee}
+                    fee={`PKR ${prog.fee.toLocaleString()}`}
                   />
                 </motion.div>
               ))}

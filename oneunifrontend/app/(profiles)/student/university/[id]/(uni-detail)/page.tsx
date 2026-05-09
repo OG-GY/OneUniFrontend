@@ -2,10 +2,14 @@
 
 import Image from "next/image";
 import { Building2, MapPin, Phone, Mail, Globe, ArrowRight } from "lucide-react";
-import { universityData } from "@/lib/data/mock-university";
+import { universities } from "@/lib/mockData";
 import Button from "@/components/ui/button";
+import { useParams } from "next/navigation";
 
 export default function UniversityOverviewPage() {
+  const params = useParams();
+  const universityData = universities.find((item) => item.id === params.id);
+  if (!universityData) return <div className="p-8">Not found</div>;
   return (
     <div className="flex flex-col gap-12 pb-20 px-6 lg:px-10 py-8">
       
@@ -31,7 +35,7 @@ export default function UniversityOverviewPage() {
                   </div>
                   <div>
                     <p className="text-sm text-text-muted">Main Campus</p>
-                    <p className="font-medium text-text-main">{universityData.location}</p>
+                <p className="font-medium text-text-main">{universityData.location}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3 p-4 bg-slate-50 rounded-xl border border-slate-100">
@@ -55,7 +59,7 @@ export default function UniversityOverviewPage() {
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
               <div className="absolute bottom-6 left-6 text-white">
                 <p className="font-medium text-lg">Main Campus</p>
-                <p className="text-white/80 text-sm">Islamabad, Pakistan</p>
+                <p className="text-white/80 text-sm">{universityData.city}, Pakistan</p>
               </div>
             </div>
           </div>

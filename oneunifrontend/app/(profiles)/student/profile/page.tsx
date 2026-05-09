@@ -12,67 +12,14 @@ import {
 import clsx from 'clsx';
 import Button from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-
-// Mock Data for the Profile
-const mockProfileData = {
-  fullName: "Muhammad Ahmed",
-  fatherName: "Muhammad Irfan",
-  cnic: "42101-1234567-1",
-  dateOfBirth: "2002-05-15",
-  gender: "Male",
-  phone: "0300-1234567",
-  email: "ahmed.irfan@example.com",
-  
-  educations: [
-    {
-      type: "Intermediate (HSSC)",
-      institute: "Govt. Degree College for Men",
-      board: "BIEK Karachi",
-      year: "2021",
-      marks: "945",
-      totalMarks: "1100"
-    },
-    {
-      type: "Matriculation (SSC)",
-      institute: "Happy Home High School",
-      board: "BSEK Karachi",
-      year: "2019",
-      marks: "780",
-      totalMarks: "850"
-    }
-  ],
-
-  hasDisability: "no",
-  isHafiz: "yes",
-  sportsQuota: "yes",
-  sportType: "Cricket",
-  isOrphan: "no",
-  needsHostel: "yes",
-
-  guardianRelation: "Father",
-  guardianName: "Muhammad Irfan",
-  guardianPhone: "0333-7654321",
-  guardianCNIC: "42101-7654321-1",
-  permanentAddress: "House #123, Block 4, Gulshan-e-Iqbal",
-  city: "Karachi",
-  annualIncome: "500k-1m",
-
-  interestedCity: "Karachi",
-  interests: ["Computer Science", "Software Engineering", "Artificial Intelligence"],
-  shift: "Morning",
-  
-  applicationStatus: "Profile Completed",
-  completionPercentage: 100,
-  studentId: "STU-2025-0892",
-  
-  entranceTests: [
-    { name: "NUST Entry Test (NET)", score: "152", total: "200", date: "2024-07-12" },
-    { name: "SAT I", score: "1480", total: "1600", date: "2023-11-20" }
-  ]
-};
+import { getUserProfile } from "@/lib/auth";
 
 export default function StudentProfilePage() {
-  const data = mockProfileData;
+  const data = getUserProfile();
+
+  if (!data) {
+    return <div className="p-8">Not found</div>;
+  }
 
   const InfoItem = ({ label, value, icon: Icon, className }: { label: string, value: string | number | undefined, icon?: any, className?: string }) => (
     <div className={clsx("flex flex-col gap-1.5", className)}>
@@ -197,7 +144,7 @@ export default function StudentProfilePage() {
                 Special Quotas
               </h3>
               <div className="grid grid-cols-2 gap-3">
-                {[
+                  {[
                   { label: 'Hafiz', val: data.isHafiz, icon: Award },
                   { label: 'Sports', val: data.sportsQuota, icon: Trophy },
                   { label: 'Hostel', val: data.needsHostel, icon: Home },
@@ -205,9 +152,9 @@ export default function StudentProfilePage() {
                 ].map((item, i) => (
                   <div key={i} className={clsx(
                     "p-3 rounded-2xl border flex flex-col gap-2 transition-all",
-                    item.val === 'yes' ? "bg-primary/5 border-primary/20" : "bg-slate-50 border-slate-100 opacity-60"
+                    item.val ? "bg-primary/5 border-primary/20" : "bg-slate-50 border-slate-100 opacity-60"
                   )}>
-                    <item.icon size={14} className={item.val === 'yes' ? "text-primary" : "text-text-muted"} />
+                    <item.icon size={14} className={item.val ? "text-primary" : "text-text-muted"} />
                     <span className="text-[10px] font-bold text-text-main">{item.label}</span>
                   </div>
                 ))}
@@ -298,7 +245,7 @@ export default function StudentProfilePage() {
                         <span className="text-xl font-black text-text-main">{test.score} <span className="text-sm font-bold text-text-muted">/ {test.total}</span></span>
                       </div>
                       <div className="h-10 w-10 rounded-full border-2 border-purple-100 flex items-center justify-center text-[10px] font-black text-purple-600 bg-white">
-                        {Math.round((parseInt(test.score) / parseInt(test.total)) * 100)}%
+                        {Math.round((Number(test.score) / Number(test.total)) * 100)}%
                       </div>
                     </div>
                   </div>

@@ -13,7 +13,7 @@ import {
   ArrowRight
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { getProgramDetails } from "@/lib/data/program-details";
+import { universities } from "@/lib/mockData";
 import Button from "@/components/ui/button";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
@@ -26,13 +26,20 @@ import { ApplicationConfirmationDrawer } from "@/components/university/Applicati
 
 export default function ProgramDetailsPage() {
   const params = useParams();
-  const router = useRouter();
   const programId = params.programId as string;
-  const program = getProgramDetails(programId);
-  const universityId = params.id as string; // Standardized university identifier
+  const universityId = params.id as string;
+  const university = universities.find((item) => item.id === universityId);
+  const program = universities
+    .flatMap((uni) => uni.departments)
+    .flatMap((dept) => dept.programs.map((programItem) => ({ ...programItem, department: dept.name })))
+    .find((programItem) => programItem.id === programId);
   
   const [activeTab, setActiveTab] = useState<"overview" | "curriculum" | "eligibility" | "fees">("overview");
   const [isApplicationDrawerOpen, setIsApplicationDrawerOpen] = useState(false);
+
+  if (!program || !university) {
+    return <div className="p-8">Not found</div>;
+  }
 
   const tabs = [
     { id: "overview", label: "Overview", icon: FileText },
@@ -68,7 +75,7 @@ export default function ProgramDetailsPage() {
         isOpen={isApplicationDrawerOpen}
         onClose={() => setIsApplicationDrawerOpen(false)}
         programName={program.name}
-        universityName={universityId.toUpperCase()} // Using ID as name proxy for now
+        universityName={university.shortName}
       />
 
       {/* Content Tabs */}
@@ -101,7 +108,7 @@ export default function ProgramDetailsPage() {
 
                     <ProgramSection title="Career Prospects">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {program.careerProspects.map((career, idx) => (
+                        {["Software Engineer", "Data Analyst", "Research Associate", "Product Engineer"].map((career, idx) => (
                           <div key={idx} className="flex items-center gap-3 p-4 bg-slate-50 rounded-xl border border-slate-100">
                             <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-primary shadow-sm">
                               <Briefcase size={18} />
@@ -116,7 +123,10 @@ export default function ProgramDetailsPage() {
 
                 {activeTab === "curriculum" && (
                   <ProgramSection title="Course Curriculum">
-                    <CurriculumList curriculum={program.curriculum} />
+                    <CurriculumList curriculum={[
+                      { semester: "Semester 1", courses: ["Programming Fundamentals", "Applied Mathematics", "Communication Skills"] },
+                      { semester: "Semester 2", courses: ["Data Structures", "Digital Logic Design", "Pakistan Studies"] },
+                    ]} />
                   </ProgramSection>
                 )}
 
@@ -124,7 +134,11 @@ export default function ProgramDetailsPage() {
                   <div className="space-y-8">
                     <ProgramSection title="Admission Eligibility">
                       <div className="space-y-4">
-                        {program.eligibility.map((criteria, idx) => (
+                        {[
+                          "Minimum 60% marks in Intermediate or equivalent qualification.",
+                          "Pass the relevant entry test as defined by university policy.",
+                          "Meet merit cutoff announced in the admission cycle.",
+                        ].map((criteria, idx) => (
                           <div key={idx} className="flex items-start gap-4 p-5 bg-primary/5 rounded-2xl border border-primary/10">
                             <div className="mt-1 text-primary">
                               <CheckCircle2 size={24} />
@@ -153,18 +167,18 @@ export default function ProgramDetailsPage() {
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <FeeCard 
                           label="Admission Fee" 
-                          amount={program.feeStructure.admissionFee} 
+                          amount={university.fees.admissionFee} 
                           subtext="One-time payment" 
                         />
                         <FeeCard 
                           label="Tuition Fee" 
-                          amount={program.feeStructure.tuitionFeePerSemester} 
+                          amount={university.fees.semester} 
                           subtext="Per Semester" 
                           highlight
                         />
                         <FeeCard 
                           label="Other Charges" 
-                          amount={program.feeStructure.otherCharges} 
+                          amount={Math.round(university.fees.semester * 0.15)} 
                           subtext="Annual charges" 
                         />
                       </div>

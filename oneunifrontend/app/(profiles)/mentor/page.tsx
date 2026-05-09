@@ -3,7 +3,8 @@
 import React from 'react';
 import { StatsCard } from '@/components/cards/stats-card';
 import { SessionCard } from '@/components/cards/session-card';
-import { MOCK_SESSIONS, MOCK_USERS } from '@/lib/dummy-data';
+import { mentorStats, mentors, reviews, sessions, students } from '@/lib/mockData';
+import { getCurrentUser } from '@/lib/auth';
 import { 
   Users, 
   Clock, 
@@ -21,12 +22,20 @@ import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
 
 export default function MentorDashboard() {
-  const upcomingSessions = MOCK_SESSIONS.filter(s => s.status === 'scheduled').slice(0, 3);
-  const activeStudents = MOCK_USERS.slice(2, 5);
-  const pendingReviews = [
-    { id: 'rev1', student: 'Fatima Noor', type: 'Resume Review', deadline: 'Today' },
-    { id: 'rev2', student: 'Zain Malik', type: 'Personal Statement', deadline: 'Tomorrow' },
-  ];
+  const currentUser = getCurrentUser();
+  const currentMentor = mentors.find(
+    (mentor) => mentor.email.toLowerCase() === (currentUser?.email || "").toLowerCase()
+  ) || mentors[0];
+  const upcomingSessions = sessions
+    .filter((session) => session.status === "scheduled" && session.mentor?.id === currentMentor.id)
+    .slice(0, 3);
+  const activeStudents = students.slice(0, 3);
+  const pendingReviews = reviews.slice(0, 2).map((review) => ({
+    id: review.id,
+    student: review.student.name,
+    type: review.sessionTopic,
+    deadline: new Date(review.date).toLocaleDateString(),
+  }));
 
   return (
     <div className="flex flex-col gap-8 px-6 lg:px-10 py-8">
@@ -46,13 +55,7 @@ export default function MentorDashboard() {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <StatsCard 
-          label="Today's Earnings" 
-          value="Rs. 4,500" 
-          icon={DollarSign}
-          color="bg-emerald-500"
-          trend={{ value: 12, isPositive: true }}
-        />
+        <StatsCard label={mentorStats[0].label} value={mentorStats[0].value} icon={DollarSign} color="bg-emerald-500" />
         <StatsCard 
           label="Active Students" 
           value={activeStudents.length} 
@@ -83,7 +86,7 @@ export default function MentorDashboard() {
                 <Clock className="text-primary" size={20} />
                 Upcoming Sessions
               </h2>
-              <Link href="/dashboard/mentor/sessions" className="text-sm text-primary font-medium hover:underline flex items-center gap-1">
+              <Link href="/mentor/sessions" className="text-sm text-primary font-medium hover:underline flex items-center gap-1">
                 View Schedule <ChevronRight size={14} />
               </Link>
             </div>
@@ -146,7 +149,7 @@ export default function MentorDashboard() {
             <h3 className="text-lg font-bold text-slate-900 mb-6">Active Mentees</h3>
             <div className="space-y-4">
               {activeStudents.map((student) => (
-                <div key={student.userId} className="flex items-center gap-3">
+                <div key={student.id} className="flex items-center gap-3">
                   <img 
                     src={student.profilePictureUrl} 
                     alt={student.fullName} 
@@ -162,7 +165,7 @@ export default function MentorDashboard() {
                 </div>
               ))}
             </div>
-            <Link href="/dashboard/mentor/students" className="block w-full mt-6">
+            <Link href="/mentor/students" className="block w-full mt-6">
               <Button variant="ghost" className="w-full text-xs font-bold text-slate-500 hover:text-primary">
                 VIEW ALL STUDENTS
               </Button>

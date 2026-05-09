@@ -1,28 +1,31 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useMemo } from "react";
 import { motion } from "framer-motion";
-import { getMe, type User } from "@/lib/api/auth";
+import { getCurrentUser, getUserProfile } from "@/lib/auth";
+import { applications, sessions, studentStats } from "@/lib/mockData";
 import { FileText, Calendar, Clock, ArrowRight, GraduationCap, ClipboardCheck } from "lucide-react";
 import Link from "next/link";
-import { Loader2 } from "lucide-react";
-
 import { StatsCard } from "@/components/cards/stats-card";
 
 export default function StudentOverviewPage() {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const currentUser = getCurrentUser();
+  const studentProfile = getUserProfile();
+  const mySessions = useMemo(() => {
+    if (!studentProfile?.id) return [];
+    return sessions.filter((session) => session.student?.id === studentProfile.id);
+  }, [studentProfile]);
+  const recentApplications = applications.slice(0, 3);
+  const applicationsInProcess = applications.filter(
+    (application) => application.status === "In Process"
+  ).length;
 
-  useEffect(() => {
-    getMe()
-      .then(setUser)
-      .catch((err) => console.error("Failed to load user", err))
-      .finally(() => setLoading(false));
-  }, []);
-
-  if (loading) {
-     return <div className="h-[50vh] flex items-center justify-center"><Loader2 className="animate-spin text-primary" size={32} /></div>;
-  }
+  const iconMap = {
+    file: FileText,
+    calendar: Calendar,
+    bookmark: GraduationCap,
+    user: Clock,
+  } as const;
 
   return (
     <div className="flex flex-col gap-8 pb-20 px-6 lg:px-10 py-8">
@@ -33,7 +36,7 @@ export default function StudentOverviewPage() {
         className="flex flex-col gap-2"
       >
         <h1 className="text-3xl font-bold text-text-main">
-          Welcome back, {user?.name?.split(' ')[0] || user?.email.split('@')[0] || 'Student'}! 👋
+          Welcome back, {studentProfile?.fullName?.split(" ")[0] || currentUser?.email?.split("@")[0] || "Student"}! 👋
         </h1>
         <p className="text-text-muted">
           Here's what's happening with your applications today.
@@ -42,24 +45,18 @@ export default function StudentOverviewPage() {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <StatsCard 
-           label="Total Applications" 
-           value="0" 
-           icon={FileText} 
-           color="bg-blue-500" 
-        />
-        <StatsCard 
-           label="Pending Actions" 
-           value="0" 
-           icon={Clock} 
-           color="bg-orange-500" 
-        />
-        <StatsCard 
-           label="Scheduled Sessions" 
-           value="0" 
-           icon={Calendar} 
-           color="bg-purple-500" 
-        />
+        {studentStats.slice(0, 3).map((stat) => {
+          const Icon = iconMap[stat.icon as keyof typeof iconMap] || FileText;
+          return (
+            <StatsCard
+              key={stat.label}
+              label={stat.label}
+              value={stat.value}
+              icon={Icon}
+              color="bg-blue-500"
+            />
+          );
+        })}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -72,16 +69,16 @@ export default function StudentOverviewPage() {
          >
             <div className="flex items-center justify-between">
                <h2 className="text-lg font-semibold text-text-main">Recent Activity</h2>
-               <button className="text-sm text-primary font-medium hover:underline">View All</button>
+               <Link href="/student/applications" className="text-sm text-primary font-medium hover:underline">View All</Link>
             </div>
-            
-            {/* Empty State */}
-            <div className="flex flex-col items-center justify-center py-12 text-center border-2 border-dashed border-slate-100 rounded-lg bg-slate-50/50">
-               <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center mb-3">
-                  <Clock className="text-slate-400" size={20} />
-               </div>
-               <p className="text-text-body font-medium">No recent activity</p>
-               <p className="text-sm text-text-muted mt-1">Your recent actions will appear here</p>
+            <div className="flex flex-col gap-3">
+              {recentApplications.map((application) => (
+                <div key={application.id} className="rounded-lg border border-slate-100 bg-slate-50/50 p-4">
+                  <p className="text-sm font-semibold text-text-main">{application.university}</p>
+                  <p className="text-xs text-text-muted">{application.program}</p>
+                  <p className="mt-1 text-xs text-text-muted">Status: {application.status}</p>
+                </div>
+              ))}
             </div>
          </motion.div>
 
@@ -123,7 +120,7 @@ export default function StudentOverviewPage() {
                   </div>
                   <h3 className="text-xl font-bold text-text-main mb-2">Eligibility Checker</h3>
                   <p className="text-text-muted text-sm leading-relaxed">
-                     Check your admission chances based on your academic marks.
+                     You have {applicationsInProcess} application(s) currently in process and {mySessions.length} mentorship session(s).
                   </p>
                </div>
                <Link 

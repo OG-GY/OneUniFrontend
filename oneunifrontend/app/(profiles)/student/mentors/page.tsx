@@ -3,11 +3,11 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { MentorCard } from "@/components/student/mentors/MentorCard";
-import { mentorData } from "@/lib/data/mock-mentors";
+import { mentors, sessions, students } from "@/lib/mockData";
+import { getCurrentUser } from "@/lib/auth";
 import { Search, Sparkles, Users, SlidersHorizontal } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Select from "@/components/ui/select";
-import { MenteeDashboard } from "@/components/student/mentors/MenteeDashboard";
 
 const FILTERS = ["All", "Engineering", "Product", "Design", "Data Science", "Marketing"];
 
@@ -19,32 +19,43 @@ const SORT_OPTIONS = [
 ];
 
 export default function MentorsPage() {
+  const currentUser = getCurrentUser();
   const [activeTab, setActiveTab] = useState("browse");
-  const [sessionTab, setSessionTab] = useState("upcoming");
   const [activeFilter, setActiveFilter] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("recommended");
 
-  const filteredMentors = mentorData.filter((mentor) => {
-    const matchesFilter = activeFilter === "All" || mentor.role.includes(activeFilter) || mentor.expertise.some(e => e.includes(activeFilter));
+  const filteredMentors = mentors.filter((mentor) => {
+    const fullName = mentor.user.fullName;
+    const specializationText = mentor.specializations.join(" ");
+    const matchesFilter =
+      activeFilter === "All" ||
+      specializationText.toLowerCase().includes(activeFilter.toLowerCase()) ||
+      mentor.designation.toLowerCase().includes(activeFilter.toLowerCase());
     const matchesSearch = 
-        mentor.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        mentor.role.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        mentor.organization.toLowerCase().includes(searchQuery.toLowerCase());
+        fullName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        mentor.designation.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        mentor.currentInstitution.toLowerCase().includes(searchQuery.toLowerCase());
     
     return matchesFilter && matchesSearch;
   }).sort((a, b) => {
     if (sortBy === "price_asc") {
-      return parseInt(a.hourlyRate.replace(/[^0-9]/g, '')) - parseInt(b.hourlyRate.replace(/[^0-9]/g, ''));
+      return a.hourlyRate - b.hourlyRate;
     }
     if (sortBy === "price_desc") {
-      return parseInt(b.hourlyRate.replace(/[^0-9]/g, '')) - parseInt(a.hourlyRate.replace(/[^0-9]/g, ''));
+      return b.hourlyRate - a.hourlyRate;
     }
     if (sortBy === "rating_desc") {
-      return b.rating - a.rating;
+      return b.averageRating - a.averageRating;
     }
     return 0;
   });
+  const currentStudent = students.find(
+    (student) => student.email.toLowerCase() === (currentUser?.email || "").toLowerCase()
+  );
+  const myEmailSessions = sessions.filter(
+    (session) => session.student?.id === currentStudent?.id
+  );
 
   return (
     <div className="min-h-screen bg-slate-50 pb-20 px-6 lg:px-10 py-8 font-sans">
@@ -165,14 +176,14 @@ export default function MentorsPage() {
             >
               <MentorCard
                 id={mentor.id}
-                name={mentor.name}
-                role={mentor.role}
-                organization={mentor.organization}
-                image={mentor.image}
-                expertise={mentor.expertise}
-                rating={mentor.rating}
-                reviews={mentor.reviews}
-                hourlyRate={mentor.hourlyRate}
+                name={mentor.user.fullName}
+                role={mentor.designation}
+                organization={mentor.currentInstitution}
+                image={mentor.user.profilePictureUrl}
+                expertise={mentor.specializations}
+                rating={mentor.averageRating}
+                reviews={mentor.totalSessions}
+                hourlyRate={`Rs. ${mentor.hourlyRate}`}
               />
             </motion.div>
           ))
@@ -184,8 +195,16 @@ export default function MentorsPage() {
         </div>
         </>
         ) : (
-            // My Sessions Tab - Integrated MenteeDashboard
-            <MenteeDashboard />
+            <div className="space-y-4">
+              {myEmailSessions.map((session) => (
+                <div key={session.sessionId} className="rounded-xl border border-slate-200 bg-white p-4">
+                  <p className="font-semibold text-slate-900">{session.topic}</p>
+                  <p className="text-sm text-slate-600">{new Date(session.scheduledAt).toLocaleString()}</p>
+                  <p className="text-xs text-slate-500">Mentor: {session.mentor.fullName}</p>
+                </div>
+              ))}
+              {myEmailSessions.length === 0 && <p className="text-sm text-slate-500">No sessions found.</p>}
+            </div>
         )}
       </div>
     </div>

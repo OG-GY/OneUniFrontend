@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { mentorData } from "@/lib/data/mock-mentors";
+import { mentors } from "@/lib/mockData";
 import { ArrowLeft, Star, MapPin, Calendar, Mail, Clock, CheckCircle, Building2, Briefcase } from "lucide-react";
 import Button from "@/components/ui/button";
 import Modal from "@/components/ui/modal";
@@ -11,8 +11,7 @@ import { motion } from "framer-motion";
 
 export default function MentorProfilePage() {
   const params = useParams();
-  const router = useRouter();
-  const mentor = mentorData.find((m) => m.id === params.id);
+  const mentor = mentors.find((m) => m.id === params.id);
 
   const [isEmailModalOpen, setIsEmailModalOpen] = useState(false);
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
@@ -22,7 +21,7 @@ export default function MentorProfilePage() {
   if (!mentor) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p>Mentor not found</p>
+        <p>Not found</p>
       </div>
     );
   }
@@ -60,31 +59,31 @@ export default function MentorProfilePage() {
             <div className="absolute top-0 left-0 w-full h-24 bg-gradient-to-br from-blue-50 to-indigo-50 border-b border-indigo-100" />
             
             <div className="w-28 h-28 rounded-2xl overflow-hidden border-4 border-white shadow-lg mb-4 relative z-10 bg-white">
-              <img src={mentor.image} alt={mentor.name} className="w-full h-full object-cover" />
+              <img src={mentor.user.profilePictureUrl} alt={mentor.user.fullName} className="w-full h-full object-cover" />
             </div>
             
             <div className="relative z-10 w-full">
-              <h1 className="text-2xl font-bold text-slate-900 mb-1">{mentor.name}</h1>
+              <h1 className="text-2xl font-bold text-slate-900 mb-1">{mentor.user.fullName}</h1>
               <p className="text-primary font-medium text-sm bg-primary/5 py-1 px-3 rounded-full inline-block mb-4 border border-primary/10">
-                {mentor.role}
+                {mentor.designation}
               </p>
               
               <div className="flex flex-col gap-3 w-full text-sm text-slate-600 mb-6">
                  <div className="flex items-center justify-center gap-2">
                     <Building2 size={16} className="text-slate-400" />
-                    <span className="font-medium">{mentor.organization}</span>
+                    <span className="font-medium">{mentor.currentInstitution}</span>
                  </div>
                  <div className="flex items-center justify-center gap-2">
                     <Star size={16} className="text-amber-500 fill-amber-500" />
-                    <span className="font-bold text-slate-900">{mentor.rating}</span>
-                    <span className="text-slate-400">({mentor.reviews} reviews)</span>
+                    <span className="font-bold text-slate-900">{mentor.averageRating}</span>
+                    <span className="text-slate-400">({mentor.totalSessions} reviews)</span>
                  </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3 w-full border-t border-slate-100 pt-6">
                   <div className="flex flex-col">
                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Hourly Rate</span>
-                     <span className="text-lg font-bold text-slate-900">{mentor.hourlyRate}</span>
+                     <span className="text-lg font-bold text-slate-900">Rs. {mentor.hourlyRate}</span>
                   </div>
                   <div className="flex flex-col border-l border-slate-100">
                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Session</span>
@@ -101,8 +100,8 @@ export default function MentorProfilePage() {
             </h3>
             <div className="flex flex-wrap gap-2">
               {mentor.availability?.map((day) => (
-                <span key={day} className="px-3 py-1.5 bg-slate-50 text-slate-600 text-xs font-bold rounded-lg border border-slate-100 hover:border-slate-300 transition-colors cursor-default">
-                  {day}
+                <span key={day.day} className="px-3 py-1.5 bg-slate-50 text-slate-600 text-xs font-bold rounded-lg border border-slate-100 hover:border-slate-300 transition-colors cursor-default">
+                  {day.day}: {day.slots.join(", ")}
                 </span>
               ))}
             </div>
@@ -203,12 +202,12 @@ export default function MentorProfilePage() {
                 <CheckCircle size={32} />
               </div>
               <h3 className="text-xl font-bold text-slate-900">Email Sent!</h3>
-              <p className="text-slate-500 mt-2">Your message has been sent to {mentor.name}.</p>
+              <p className="text-slate-500 mt-2">Your message has been sent to {mentor.user.fullName}.</p>
             </div>
           ) : (
             <>
               <h3 className="text-xl font-bold text-slate-900 mb-1">Send a Message</h3>
-              <p className="text-slate-500 text-sm mb-6">Send a direct email to {mentor.name}.</p>
+              <p className="text-slate-500 text-sm mb-6">Send a direct email to {mentor.user.fullName}.</p>
               
               <form onSubmit={handleSendEmail} className="space-y-4">
                 <div>
@@ -242,12 +241,12 @@ export default function MentorProfilePage() {
                 <CheckCircle size={32} />
               </div>
               <h3 className="text-xl font-bold text-slate-900">Request Sent!</h3>
-              <p className="text-slate-500 mt-2">Your session request has been sent to {mentor.name}.</p>
+              <p className="text-slate-500 mt-2">Your session request has been sent to {mentor.user.fullName}.</p>
             </div>
           ) : (
             <>
               <h3 className="text-xl font-bold text-slate-900 mb-1">Book a Session</h3>
-              <p className="text-slate-500 text-sm mb-6">Schedule a 1:1 meeting with {mentor.name}.</p>
+              <p className="text-slate-500 text-sm mb-6">Schedule a 1:1 meeting with {mentor.user.fullName}.</p>
               
               <form onSubmit={handleBookSession} className="space-y-4">
                 <div>

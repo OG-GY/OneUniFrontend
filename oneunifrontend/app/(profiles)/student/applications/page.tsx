@@ -4,34 +4,16 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { FileText, Clock, CheckCircle2, MoreHorizontal, Building2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { applications } from "@/lib/mockData";
 
 const TABS = ["All", "Submitted", "Draft", "In Process"];
-
-const MOCK_APPLICATIONS = [
-  {
-    id: 1,
-    university: "Stanford University",
-    program: "M.S. Computer Science",
-    status: "In Process",
-    lastUpdated: "2 days ago",
-    universityImage: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Seal_of_Leland_Stanford_Junior_University.svg/1200px-Seal_of_Leland_Stanford_Junior_University.svg.png"
-  },
-  {
-    id: 2,
-    university: "MIT",
-    program: "M.Eng. Electrical Engineering",
-    status: "Draft",
-    lastUpdated: "5 days ago",
-    universityImage: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/MIT_logo.svg/2560px-MIT_logo.svg.png"
-  }
-];
 
 export default function ApplicationsPage() {
   const [activeTab, setActiveTab] = useState("All");
 
   const filteredApps = activeTab === "All" 
-    ? MOCK_APPLICATIONS 
-    : MOCK_APPLICATIONS.filter(app => app.status === activeTab);
+    ? applications
+    : applications.filter(app => app.status === activeTab);
 
   return (
     <div className="flex flex-col gap-8 min-h-screen bg-slate-50 pb-20 px-6 lg:px-10 py-8">

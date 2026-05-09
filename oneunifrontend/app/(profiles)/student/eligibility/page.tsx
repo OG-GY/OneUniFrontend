@@ -21,6 +21,7 @@ import { cn } from "@/lib/utils";
 import Button from "@/components/ui/button";
 import Input from "@/components/ui/input";
 import Select from "@/components/ui/select";
+import { universities } from "@/lib/mockData";
 
 interface TestScore {
   id: string;
@@ -33,21 +34,21 @@ interface UniversityResult {
   id: string;
   university: string;
   program: string;
-  matchingPercentage: number;
   requiredAggregate: number;
   yourAggregate: number;
-  status: "Highly Likely" | "Likely" | "Borderline" | "Unlikely";
+  status: "Likely" | "Unlikely" | "Not Eligible";
   campus: string;
   logo: string;
+  reason: string;
 }
 
 const TEST_OPTIONS = [
-  { value: "NET", label: "NUST Entry Test (NET)" },
-  { value: "ECAT", label: "ECAT (UET)" },
-  { value: "SAT", label: "SAT (International)" },
-  { value: "FAST-NU", label: "FAST NU Admission Test" },
-  { value: "MDCA", label: "MDCAT" },
-  { value: "USAT", label: "HEC USAT" },
+  { value: "ECAT", label: "ECAT (UET Lahore)" },
+  { value: "NET", label: "NET (NUST Islamabad)" },
+  { value: "PU-E", label: "PU-E (PU Lahore)" },
+  { value: "PU-M", label: "PU-M (PU Lahore)" },
+  { value: "PU-AHS", label: "PU-AHS (PU Lahore)" },
+  { value: "PU-COM", label: "PU-COM (PU Lahore)" },
 ];
 
 const INTER_TYPE_OPTIONS = [
@@ -55,41 +56,8 @@ const INTER_TYPE_OPTIONS = [
   { value: "first_year", label: "First Year Only" },
 ];
 
-const MOCK_RESULTS: UniversityResult[] = [
-  {
-    id: "1",
-    university: "NUST",
-    campus: "Islamabad",
-    program: "BS Computer Science",
-    matchingPercentage: 85,
-    requiredAggregate: 78.5,
-    yourAggregate: 0,
-    status: "Highly Likely",
-    logo: "https://upload.wikimedia.org/wikipedia/en/a/ab/NUST_Vector_Logo.path"
-  },
-  {
-    id: "2",
-    university: "FAST NUCES",
-    campus: "Karachi",
-    program: "BS Software Engineering",
-    matchingPercentage: 92,
-    requiredAggregate: 72,
-    yourAggregate: 0,
-    status: "Highly Likely",
-    logo: "https://upload.wikimedia.org/wikipedia/en/b/b8/FAST_NU_logo.png"
-  },
-  {
-    id: "3",
-    university: "UET",
-    campus: "Lahore",
-    program: "BS Electrical Engineering",
-    matchingPercentage: 45,
-    requiredAggregate: 88,
-    yourAggregate: 0,
-    status: "Unlikely",
-    logo: "https://upload.wikimedia.org/wikipedia/en/b/be/UET_Lahore_Logo.png"
-  }
-];
+const MATRIC_TOTAL = 1100;
+const trackedUniversities = ["uet-lahore", "nust-islamabad", "pu-lahore"] as const;
 
 export default function EligibilityPage() {
   const [matricMarks, setMatricMarks] = useState("");
@@ -103,6 +71,7 @@ export default function EligibilityPage() {
   const [isSearching, setIsSearching] = useState(false);
   const [results, setResults] = useState<UniversityResult[]>([]);
   const [hasSearched, setHasSearched] = useState(false);
+  const [formError, setFormError] = useState("");
 
   const addTest = () => {
     setTests([...tests, { id: Date.now().toString(), testName: "", obtainedMarks: "", totalMarks: "" }]);
@@ -119,6 +88,14 @@ export default function EligibilityPage() {
   };
 
   const handleSearch = () => {
+    if (!matricMarks.trim() || !interMarks.trim()) {
+      setFormError("Matric and Intermediate marks are required.");
+      setHasSearched(false);
+      setResults([]);
+      return;
+    }
+
+    setFormError("");
     setIsSearching(true);
     setHasSearched(false);
     
@@ -126,40 +103,124 @@ export default function EligibilityPage() {
       setIsSearching(false);
       const mMarks = parseFloat(matricMarks) || 0;
       const iMarks = parseFloat(interMarks) || 0;
-      const academicBase = ((mMarks / 1100) * 10) + ((iMarks / 1100) * 40);
-      
-      const dynamicResults = MOCK_RESULTS.map(uni => {
-        const test = tests[0]?.obtainedMarks ? 
-          (parseFloat(tests[0].obtainedMarks) / (parseFloat(tests[0].totalMarks) || 200)) * 50 : 
-          35;
-          
-        const yourAgg = parseFloat((academicBase + test).toFixed(2));
-        const diff = yourAgg - uni.requiredAggregate;
-        
-        let status: UniversityResult["status"] = "Unlikely";
-        let prob = 0;
-        
-        if (diff > 5) {
-          status = "Highly Likely";
-          prob = 85 + diff;
-        } else if (diff > 0) {
-          status = "Likely";
-          prob = 70 + diff * 3;
-        } else if (diff > -5) {
-          status = "Borderline";
-          prob = 40 + diff * 4;
-        } else {
+      const interTotalValue = Number(interTotal) || 1100;
+      const matricPercent = (mMarks / MATRIC_TOTAL) * 100;
+      const interPercent = (iMarks / interTotalValue) * 100;
+
+      const validTests = tests.filter(
+        (test) => test.testName && test.obtainedMarks.trim() !== ""
+      );
+
+      const getTestByName = (name: string) =>
+        validTests.find((test) => test.testName === name);
+
+      const uet = universities.find((item) => item.id === "uet-lahore");
+      const nust = universities.find((item) => item.id === "nust-islamabad");
+      const pu = universities.find((item) => item.id === "pu-lahore");
+
+      const dynamicResults: UniversityResult[] = [];
+
+      const ecatTest = getTestByName("ECAT");
+      if (ecatTest) {
+        const ecatScore = Number(ecatTest.obtainedMarks) || 0;
+        const uetAggregate = Number(
+          ((matricPercent * 0.25) + (interPercent * 0.75)).toFixed(2)
+        );
+        const requiredAggregate = 78;
+        const diff = uetAggregate - requiredAggregate;
+        const passedEcatCutoff = ecatScore >= 160;
+        let status: UniversityResult["status"] = "Likely";
+        let reason = "Your aggregate meets UET's average closing merit for BS Engineering.";
+
+        if (!passedEcatCutoff) {
+          status = "Not Eligible";
+          reason = "ECAT cutoff not met (minimum 160/400 required for eligibility).";
+        } else if (diff < -5) {
+          status = "Not Eligible";
+          reason = "Your aggregate is significantly below UET's average closing merit.";
+        } else if (diff < 0) {
           status = "Unlikely";
-          prob = 20 + diff * 2;
+          reason = "Your aggregate is slightly below UET's average closing merit.";
         }
 
-        return {
-          ...uni,
-          yourAggregate: yourAgg,
+        dynamicResults.push({
+          id: "uet-lahore",
+          university: uet?.shortName || "UET Lahore",
+          program: "BS Engineering",
+          requiredAggregate,
+          yourAggregate: uetAggregate,
           status,
-          matchingPercentage: Math.min(Math.max(Math.round(prob), 5), 98)
-        };
-      });
+          campus: uet?.city || "Lahore",
+          logo: uet?.logo || "",
+          reason,
+        });
+      }
+
+      const netTest = getTestByName("NET");
+      if (netTest) {
+        const netPercent = ((Number(netTest.obtainedMarks) || 0) / 200) * 100;
+        const nustAggregate = Number(
+          ((netPercent * 0.75) + (interPercent * 0.25)).toFixed(2)
+        );
+        const requiredAggregate = 88;
+        const diff = nustAggregate - requiredAggregate;
+        let status: UniversityResult["status"] = "Likely";
+        let reason = "Your aggregate meets NUST's average closing merit for SEECS programs.";
+
+        if (diff < -5) {
+          status = "Not Eligible";
+          reason = "Your aggregate is well below NUST's typical closing merit range (87-89).";
+        } else if (diff < 0) {
+          status = "Unlikely";
+          reason = "Your aggregate is slightly below NUST's typical closing merit range.";
+        }
+
+        dynamicResults.push({
+          id: "nust-islamabad",
+          university: nust?.shortName || "NUST Islamabad",
+          program: "BS CS / BS EE",
+          requiredAggregate,
+          yourAggregate: nustAggregate,
+          status,
+          campus: nust?.city || "Islamabad",
+          logo: nust?.logo || "",
+          reason,
+        });
+      }
+
+      const puTest = validTests.find((test) => test.testName.startsWith("PU-"));
+      if (puTest) {
+        const puTestTotal = Number(puTest.totalMarks) || 100;
+        const puTestPercent = ((Number(puTest.obtainedMarks) || 0) / puTestTotal) * 100;
+        const academicMerit = (matricPercent * 0.4) + (interPercent * 0.6);
+        const puAggregate = Number(
+          ((academicMerit * 0.75) + (puTestPercent * 0.25)).toFixed(2)
+        );
+        const requiredAggregate = 68;
+        const diff = puAggregate - requiredAggregate;
+        let status: UniversityResult["status"] = "Likely";
+        let reason = "Your aggregate meets PU's average closing merit for morning BS programs.";
+
+        if (diff < -5) {
+          status = "Not Eligible";
+          reason = "Your aggregate is well below PU's typical closing merit range (65-70).";
+        } else if (diff < 0) {
+          status = "Unlikely";
+          reason = "Your aggregate is slightly below PU's average closing merit.";
+        }
+
+        dynamicResults.push({
+          id: "pu-lahore",
+          university: pu?.shortName || "PU Lahore",
+          program: "Morning BS Programs",
+          requiredAggregate,
+          yourAggregate: puAggregate,
+          status,
+          campus: pu?.city || "Lahore",
+          logo: pu?.logo || "",
+          reason,
+        });
+      }
 
       setResults(dynamicResults);
       setHasSearched(true);
@@ -186,7 +247,7 @@ export default function EligibilityPage() {
             
             <div className="flex flex-col gap-4">
               <div className="space-y-1">
-                <label className="text-sm font-medium text-text-body">Matric (10%)</label>
+                <label className="text-sm font-medium text-text-body">Matric Marks</label>
                 <div className="flex gap-2">
                   <Input 
                     placeholder="Obtained Marks" 
@@ -200,7 +261,7 @@ export default function EligibilityPage() {
 
               <div className="space-y-1">
                 <div className="flex justify-between items-center">
-                  <label className="text-sm font-medium text-text-body">Intermediate (40%)</label>
+                  <label className="text-sm font-medium text-text-body">Intermediate Marks</label>
                   <div className="w-32 text-xs">
                     <Select 
                       options={INTER_TYPE_OPTIONS}
@@ -234,7 +295,7 @@ export default function EligibilityPage() {
             <div className="flex items-center justify-between">
               <h2 className="font-bold text-lg text-text-main flex items-center gap-2">
                 <TrendingUp className="text-secondary" size={20} />
-                Entrance Tests (50%)
+                Entry Tests
               </h2>
               <button 
                 onClick={addTest}
@@ -296,6 +357,12 @@ export default function EligibilityPage() {
           >
             {isSearching ? "Searching..." : "Calculate Eligibility"}
           </Button>
+          <p className="text-xs text-text-muted leading-relaxed">
+            UET Lahore: Matric 25% + FSc 75% (ECAT determines eligibility cutoff) | NUST Islamabad: NET 75% + FSc 25% | PU Lahore: Academic Merit 75% (Matric + Inter weighted) + PU Entry Test 25%
+          </p>
+          {formError && (
+            <p className="text-sm text-red-500 font-medium">{formError}</p>
+          )}
         </div>
 
         {/* Results Section (7 cols out of 12) */}
@@ -324,7 +391,7 @@ export default function EligibilityPage() {
                    <h2 className="font-bold text-xl text-text-main">Recommended Programs</h2>
                    <span className="text-sm font-medium text-text-muted">{results.length} results found</span>
                 </div>
-                {results.map((res, index) => (
+                {results.length > 0 ? results.map((res, index) => (
                   <motion.div
                     key={res.id}
                     initial={{ opacity: 0, y: 10 }}
@@ -334,7 +401,11 @@ export default function EligibilityPage() {
                   >
                     <div className="flex items-center gap-4 flex-1">
                        <div className="w-16 h-16 rounded-lg border border-slate-100 p-2 flex items-center justify-center bg-white shrink-0">
-                          <School className="text-primary" size={32} />
+                          {res.logo ? (
+                            <img src={res.logo} alt={res.university} className="w-full h-full object-contain" />
+                          ) : (
+                            <School className="text-primary" size={32} />
+                          )}
                        </div>
                        <div className="min-w-0 flex-1">
                           <h3 className="font-bold text-lg text-text-main truncate">{res.university}</h3>
@@ -356,14 +427,13 @@ export default function EligibilityPage() {
                        <div className="flex flex-col items-end gap-1">
                           <span className={cn(
                              "px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider",
-                             res.status === "Highly Likely" ? "bg-green-100 text-green-700" :
-                             res.status === "Likely" ? "bg-blue-100 text-blue-700" :
-                             res.status === "Borderline" ? "bg-orange-100 text-orange-700" :
+                             res.status === "Likely" ? "bg-green-100 text-green-700" :
+                             res.status === "Unlikely" ? "bg-orange-100 text-orange-700" :
                              "bg-red-100 text-red-700"
                           )}>
                              {res.status}
                           </span>
-                          <span className="text-[10px] font-bold text-text-muted">{res.matchingPercentage}% Success Rate</span>
+                          <span className="text-[10px] font-bold text-text-muted">{res.reason}</span>
                        </div>
                        <div className="hidden md:block h-12 w-[2px] bg-slate-100" />
                        <button className="px-5 py-2.5 bg-white border border-slate-200 hover:border-primary hover:text-primary text-text-body font-bold rounded-xl text-sm transition-all shadow-sm">
@@ -371,7 +441,11 @@ export default function EligibilityPage() {
                        </button>
                     </div>
                   </motion.div>
-                ))}
+                )) : (
+                  <div className="rounded-xl border border-slate-200 bg-white p-6">
+                    <p className="text-sm text-text-muted">Enter at least one entry test score to see university results</p>
+                  </div>
+                )}
               </motion.div>
             ) : (
               <div className="flex flex-col items-center justify-center py-32 bg-white rounded-xl border border-slate-200 border-dashed">

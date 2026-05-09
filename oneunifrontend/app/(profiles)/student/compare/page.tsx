@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Select from "@/components/ui/select";
+import { universities } from "@/lib/mockData";
 
 // Mock Data
 const ALL_DEGREES = [
@@ -26,21 +27,17 @@ const ALL_DEGREES = [
   "BE Mechanical Engineering"
 ];
 
-const ALL_UNIVERSITIES = [
-  { id: 1, uni: "FAST-NUCES", campus: "Islamabad", logo: "https://upload.wikimedia.org/wikipedia/en/thumb/b/b8/FAST_University_logo.png/220px-FAST_University_logo.png" },
-  { id: 2, uni: "NUST", campus: "H-12, Islamabad", logo: "https://upload.wikimedia.org/wikipedia/en/thumb/5/52/National_University_of_Sciences_and_Technology_logo.png/220px-National_University_of_Sciences_and_Technology_logo.png" },
-  { id: 3, uni: "UET Lahore", campus: "Main Campus", logo: "https://upload.wikimedia.org/wikipedia/en/thumb/a/a2/UET_Lahore_Logo.png/220px-UET_Lahore_Logo.png" },
-  { id: 4, uni: "COMSATS", campus: "Islamabad", logo: "https://upload.wikimedia.org/wikipedia/en/thumb/c/c2/COMSATS_University_Islamabad_logo.png/220px-COMSATS_University_Islamabad_logo.png" },
-  { id: 5, uni: "GIKI", campus: "Topi", logo: "https://upload.wikimedia.org/wikipedia/en/thumb/5/5d/GIKI_Logo.png/220px-GIKI_Logo.png" },
-  { id: 6, uni: "LUMS", campus: "DHA, Lahore", logo: "https://upload.wikimedia.org/wikipedia/en/thumb/e/ef/LUMS_Logo.png/220px-LUMS_Logo.png" },
-  { id: 7, uni: "ITU", campus: "Arfa Tower, Lahore", logo: "https://upload.wikimedia.org/wikipedia/en/thumb/4/4b/ITU_Logo.png/220px-ITU_Logo.png" },
-  { id: 8, uni: "PUCIT", campus: "Old Campus, Lahore", logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/PU_crest.png/220px-PU_crest.png" },
-];
+const ALL_UNIVERSITIES = universities.map((uni) => ({
+  id: uni.id,
+  uni: uni.shortName,
+  campus: uni.city,
+  logo: uni.logo,
+}));
 
 export default function ProgramComparisonPage() {
   const [activeSection, setActiveSection] = useState("admission");
   const [progA, setProgA] = useState(ALL_UNIVERSITIES[0]);
-  const [progB, setProgB] = useState(ALL_UNIVERSITIES[1]);
+  const [progB, setProgB] = useState(ALL_UNIVERSITIES[1] || ALL_UNIVERSITIES[0]);
   const [selectedDegree, setSelectedDegree] = useState(ALL_DEGREES[0]);
   
   const [isSearchingA, setIsSearchingA] = useState(false);
