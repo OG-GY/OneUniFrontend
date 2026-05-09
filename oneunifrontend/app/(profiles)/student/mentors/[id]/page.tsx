@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { mentors } from "@/lib/mockData";
 import { ArrowLeft, Star, MapPin, Calendar, Mail, Clock, CheckCircle, Building2, Briefcase } from "lucide-react";
 import Button from "@/components/ui/button";
@@ -21,7 +21,7 @@ export default function MentorProfilePage() {
   if (!mentor) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p>Not found</p>
+        <p>Mentor not found</p>
       </div>
     );
   }
@@ -148,7 +148,7 @@ export default function MentorProfilePage() {
               Areas of Expertise
             </h2>
             <div className="flex flex-wrap gap-3">
-              {mentor.expertise.map((skill, index) => (
+              {mentor.specializations.map((skill, index) => (
                 <span 
                   key={index}
                   className="px-4 py-2 rounded-xl bg-slate-50 text-slate-700 font-medium border border-slate-200 text-sm hover:border-primary/30 hover:bg-primary/5 hover:text-primary transition-all cursor-default"
@@ -182,7 +182,7 @@ export default function MentorProfilePage() {
                           </div>
                        </div>
                        <p className="text-slate-600 text-sm leading-relaxed">
-                          "Absolutely amazing session! {mentor.name} provided distinct layout action plans for my career transition. Highly recommended!"
+                          "Absolutely amazing session! {mentor.user.fullName} provided distinct layout action plans for my career transition. Highly recommended!"
                        </p>
                        <span className="text-xs text-slate-400 font-medium mt-1">2 days ago</span>
                     </div>
