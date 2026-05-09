@@ -7,11 +7,14 @@ import {
   Bell, 
   Calendar,
   Menu,
-  X 
+  X,
+  Loader2,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Sidebar } from "./sidebar";
 import { cn } from "@/lib/utils";
+import { Role } from "@/lib/api/auth";
+import { useAuthGuard } from "@/hooks/useAuth";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -21,11 +24,20 @@ interface DashboardLayoutProps {
 export function DashboardLayout({ children, role = "student" }: DashboardLayoutProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pathname = usePathname();
+  const { currentUser, isChecking } = useAuthGuard(role as Role);
 
   // Close mobile menu on route change
   useEffect(() => {
     setIsMobileMenuOpen(false);
   }, [pathname]);
+
+  if (isChecking || !currentUser) {
+    return (
+      <div className="h-screen w-full flex items-center justify-center bg-slate-50">
+        <Loader2 className="animate-spin text-primary" size={32} />
+      </div>
+    );
+  }
 
   return (
     <div className="h-screen w-full bg-slate-50 flex overflow-hidden font-sans fixed inset-0">
@@ -44,7 +56,7 @@ export function DashboardLayout({ children, role = "student" }: DashboardLayoutP
 
       {/* Sidebar Component (Desktop) */}
       <Sidebar 
-        role={role} 
+        role={currentUser.role} 
         className="hidden lg:flex shrink-0" 
       />
 
@@ -58,7 +70,7 @@ export function DashboardLayout({ children, role = "student" }: DashboardLayoutP
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
             className="fixed inset-y-0 left-0 z-50 w-72 lg:hidden shadow-2xl"
           >
-            <Sidebar role={role} className="w-full h-full !flex" />
+            <Sidebar role={currentUser.role} className="w-full h-full !flex" />
             <button 
               onClick={() => setIsMobileMenuOpen(false)}
               className="absolute top-4 right-[-50px] p-2 bg-white rounded-lg text-slate-800 shadow-xl border border-slate-100"

@@ -7,7 +7,7 @@ import { GraduationCap, Briefcase, ChevronRight, Loader2, Building2 } from "luci
 import Content from "@/components/sections/(Auth)/content-section";
 import RoleSelector from "@/components/ui/role-selector";
 import Button from "@/components/ui/button";
-import { completeGoogleSignup, type Role } from "@/lib/api/auth";
+import { register, type Role, getDashboardPathByRole } from "@/lib/api/auth";
 
 export default function SignupCallbackPage() {
   const router = useRouter();
@@ -30,8 +30,14 @@ export default function SignupCallbackPage() {
     setError("");
 
     try {
-      await completeGoogleSignup({ role });
-      router.push("/redirecting");
+      const generatedEmail = `${role}.${Date.now()}@oneuni.com`;
+      const response = await register({
+        fullName: role === "mentor" ? "Mentor User" : "Student User",
+        email: generatedEmail,
+        password: "password123",
+        role,
+      });
+      router.push(getDashboardPathByRole(response.user.role));
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to complete registration. Please try again.");
       setIsLoading(false);

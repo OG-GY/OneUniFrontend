@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Loader2 } from "lucide-react";
-import { getMe } from "@/lib/api/auth";
+import { getDashboardPathByRole, getMe } from "@/lib/api/auth";
 
 export default function RedirectingPage() {
   const router = useRouter();
@@ -18,17 +18,7 @@ export default function RedirectingPage() {
         // Add a small delay for smoother UX so the loading screen doesn't just flash
         await new Promise(resolve => setTimeout(resolve, 800));
 
-        if (user.role === "student") {
-          router.push("/student");
-        } else if (user.role === "mentor") {
-           // Placeholder for mentor dashboard
-           router.push("/mentor/dashboard");
-        } else if (user.role === "university_representative") {
-           router.push("/university/dashboard");
-        } else {
-          // Fallback
-          router.push("/student");
-        }
+        router.push(getDashboardPathByRole(user.role));
       } catch (err) {
         console.error("Redirect logic error:", err);
         setError("Failed to verify identity. Redirecting to login...");

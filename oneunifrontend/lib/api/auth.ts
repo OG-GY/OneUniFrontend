@@ -1,21 +1,22 @@
-import { env } from '@/lib/config/env';
-import { ENDPOINTS } from '@/lib/api/endpoint';
+export type Role = "student" | "mentor";
 
-// ============ Types ============
+const USERS_KEY = "users";
+const CURRENT_USER_KEY = "currentUser";
 
-export type Role = 'student' | 'mentor' | 'university_representative';
-
-const ROLE_TO_ID: Record<Role, number> = {
-  student: 0,
-  mentor: 1,
-  university_representative: 2,
-};
-
-const ID_TO_ROLE: Record<number, Role> = {
-  0: 'student',
-  1: 'mentor',
-  2: 'university_representative',
-};
+const SEEDED_USERS: StoredUser[] = [
+  {
+    name: "Student User",
+    email: "student@oneuni.com",
+    password: "password123",
+    role: "student",
+  },
+  {
+    name: "Mentor User",
+    email: "mentor@oneuni.com",
+    password: "password123",
+    role: "mentor",
+  },
+];
 
 export interface LoginRequest {
   email: string;
@@ -29,195 +30,140 @@ export interface RegisterRequest {
   role: Role;
 }
 
-export interface User {
-  id: string;
+interface StoredUser {
+  name: string;
   email: string;
-  name?: string;
+  password: string;
   role: Role;
 }
 
-interface ApiUser {
-  id: string;
+export interface User {
+  name: string;
   email: string;
-  name?: string;
-  role: number;
+  role: Role;
 }
 
 export interface AuthResponse {
   user: User;
-  expiresAt: string;
 }
 
-interface ApiAuthResponse {
-  user: ApiUser;
-  expiresAt: string;
+function canUseStorage(): boolean {
+  return typeof window !== "undefined";
 }
 
-export interface CompleteSignupPayload {
-  role: Role;
+function normalizeEmail(email: string): string {
+  return email.trim().toLowerCase();
 }
 
-// ============ Helpers ============
+function readUsers(): StoredUser[] {
+  if (!canUseStorage()) return SEEDED_USERS;
+  const raw = localStorage.getItem(USERS_KEY);
+  if (!raw) return [];
 
-function mapApiUserToUser(apiUser: ApiUser): User {
+  try {
+    const parsed = JSON.parse(raw) as StoredUser[];
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function writeUsers(users: StoredUser[]) {
+  if (!canUseStorage()) return;
+  localStorage.setItem(USERS_KEY, JSON.stringify(users));
+}
+
+function toPublicUser(user: StoredUser): User {
   return {
-    ...apiUser,
-    role: ID_TO_ROLE[apiUser.role] || 'student', // Fallback to student
+    name: user.name,
+    email: user.email,
+    role: user.role,
   };
 }
 
-// Client-side helper to read cookie if needed, but usually browser handles it.
-// However, typically XSRF token needs to be read from cookie and sent in header.
-// I'll add a simple helper for that.
-function getXsrfToken(): string | null {
-  if (typeof document === 'undefined') return null;
-  const match = document.cookie.match(new RegExp('(^| )XSRF-TOKEN=([^;]+)'));
-  return match ? decodeURIComponent(match[2]) : null;
+export function ensureSeedUsers() {
+  if (!canUseStorage()) return;
+  const existing = localStorage.getItem(USERS_KEY);
+  if (!existing) {
+    writeUsers(SEEDED_USERS);
+  }
 }
 
-// ============ API Functions ============
+export function getCurrentUser(): User | null {
+  if (!canUseStorage()) return null;
+  const raw = localStorage.getItem(CURRENT_USER_KEY);
+  if (!raw) return null;
 
-/**
- * Register a new user with email/password.
- */
+  try {
+    const parsed = JSON.parse(raw) as User;
+    if (!parsed?.email || !parsed?.role) return null;
+    return parsed;
+  } catch {
+    return null;
+  }
+}
+
+export function setCurrentUser(user: User) {
+  if (!canUseStorage()) return;
+  localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(user));
+}
+
+export function getDashboardPathByRole(role: Role): string {
+  return role === "mentor" ? "/mentor" : "/student";
+}
+
 export async function register(payload: RegisterRequest): Promise<AuthResponse> {
-  const apiPayload = {
-    ...payload,
-    role: ROLE_TO_ID[payload.role],
-  };
+  ensureSeedUsers();
+  const users = readUsers();
+  const normalizedEmail = normalizeEmail(payload.email);
+  const emailExists = users.some((user) => normalizeEmail(user.email) === normalizedEmail);
 
-  const response = await fetch(`${env.apiUrl}${ENDPOINTS.REGISTER}`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-    },
-    credentials: 'include',
-    body: JSON.stringify(apiPayload),
-  });
-
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({ message: 'Registration failed' }));
-    throw new Error(error.message || 'Registration failed');
+  if (emailExists) {
+    throw new Error("User already exists");
   }
 
-  const data: ApiAuthResponse = await response.json();
-  return {
-    ...data,
-    user: mapApiUserToUser(data.user),
+  const newUser: StoredUser = {
+    name: payload.fullName.trim(),
+    email: normalizedEmail,
+    password: payload.password,
+    role: payload.role,
   };
+
+  writeUsers([...users, newUser]);
+
+  const publicUser = toPublicUser(newUser);
+  setCurrentUser(publicUser);
+  return { user: publicUser };
 }
 
-/**
- * Login with email/password.
- */
 export async function login(payload: LoginRequest): Promise<AuthResponse> {
-  const response = await fetch(`${env.apiUrl}${ENDPOINTS.LOGIN}`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-    },
-    credentials: 'include',
-    body: JSON.stringify(payload),
-  });
+  ensureSeedUsers();
+  const users = readUsers();
+  const normalizedEmail = normalizeEmail(payload.email);
+  const matched = users.find(
+    (user) =>
+      normalizeEmail(user.email) === normalizedEmail && user.password === payload.password
+  );
 
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({ message: 'Login failed' }));
-    throw new Error(error.message || 'Login failed');
+  if (!matched) {
+    throw new Error("Invalid email or password");
   }
 
-  const data: ApiAuthResponse = await response.json();
-  return {
-    ...data,
-    user: mapApiUserToUser(data.user),
-  };
+  const publicUser = toPublicUser(matched);
+  setCurrentUser(publicUser);
+  return { user: publicUser };
 }
 
-/**
- * Refresh access token using refresh token.
- */
-export async function refreshToken(): Promise<AuthResponse> {
-  const response = await fetch(`${env.apiUrl}${ENDPOINTS.REFRESH}`, {
-    method: 'POST',
-    headers: {
-      'Accept': 'application/json',
-    },
-    credentials: 'include',
-  });
-
-  if (!response.ok) {
-    throw new Error('Token refresh failed');
-  }
-
-  const data: ApiAuthResponse = await response.json();
-  return {
-    ...data,
-    user: mapApiUserToUser(data.user),
-  };
-}
-
-/**
- * Logout the current user.
- */
 export async function logout(): Promise<void> {
-  const response = await fetch(`${env.apiUrl}${ENDPOINTS.LOGOUT}`, {
-    method: 'POST',
-    credentials: 'include',
-  });
-
-  if (!response.ok) {
-    throw new Error('Logout failed');
-  }
+  if (!canUseStorage()) return;
+  localStorage.removeItem(CURRENT_USER_KEY);
 }
 
-/**
- * Get the current authenticated user.
- */
 export async function getMe(): Promise<User> {
-  const response = await fetch(`${env.apiUrl}${ENDPOINTS.ME}`, {
-    method: 'GET',
-    headers: {
-      'Accept': 'application/json',
-      'X-XSRF-TOKEN': getXsrfToken() || '',
-    },
-    credentials: 'include',
-  });
-
-  if (!response.ok) {
-    throw new Error('Failed to get user');
+  ensureSeedUsers();
+  const user = getCurrentUser();
+  if (!user) {
+    throw new Error("No authenticated user");
   }
-
-  const data: ApiUser = await response.json();
-  return mapApiUserToUser(data);
-}
-
-/**
- * Complete Google OAuth signup with role selection.
- */
-export async function completeGoogleSignup(payload: CompleteSignupPayload): Promise<AuthResponse> {
-  const apiPayload = {
-    role: ROLE_TO_ID[payload.role],
-  };
-
-  const response = await fetch(`${env.apiUrl}${ENDPOINTS.GOOGLE_OAUTH_COMPLETE_SIGNUP}`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-    },
-    credentials: 'include',
-    body: JSON.stringify(apiPayload),
-  });
-
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({ message: 'Signup completion failed' }));
-    throw new Error(error.message || 'Signup completion failed');
-  }
-
-  const data: ApiAuthResponse = await response.json();
-  return {
-    ...data,
-    user: mapApiUserToUser(data.user),
-  };
+  return user;
 }

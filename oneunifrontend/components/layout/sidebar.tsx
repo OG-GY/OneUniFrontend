@@ -2,11 +2,12 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { GraduationCap, LogOut, ChevronRight } from "lucide-react";
+import { GraduationCap, LogOut } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { navConfig } from "@/lib/data/navigation";
+import { getCurrentUser, logout } from "@/lib/api/auth";
 
 interface SidebarProps {
   role: string;
@@ -15,11 +16,18 @@ interface SidebarProps {
 
 export function Sidebar({ role, className }: SidebarProps) {
   const pathname = usePathname();
+  const router = useRouter();
   const [isHovered, setIsHovered] = useState(false);
+  const currentUser = getCurrentUser();
   
   // Normalize role to lowercase for lookup
   const normalizedRole = role.toLowerCase();
   const menuItems = navConfig[normalizedRole] || navConfig["student"];
+
+  const handleLogout = async () => {
+    await logout();
+    router.replace("/login");
+  };
 
   return (
     <motion.aside
@@ -106,7 +114,11 @@ export function Sidebar({ role, className }: SidebarProps) {
 
       {/* User / Bottom Action Area */}
       <div className="p-3 border-t border-slate-100 mt-auto bg-slate-50/50">
-        <div className="flex items-center h-12 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer overflow-hidden p-1">
+        <button
+          type="button"
+          onClick={handleLogout}
+          className="w-full flex items-center h-12 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer overflow-hidden p-1"
+        >
           <div className="w-9 h-9 min-w-[36px] rounded-lg bg-white border border-slate-200 flex items-center justify-center text-xs font-bold text-slate-600 shrink-0 shadow-sm capitalize">
             {role.charAt(0)}
           </div>
@@ -118,7 +130,9 @@ export function Sidebar({ role, className }: SidebarProps) {
                 exit={{ opacity: 0, x: -10 }}
                 className="ml-3 flex-1 overflow-hidden"
               >
-                <p className="text-[12px] font-bold text-slate-900 truncate">My Account</p>
+                <p className="text-[12px] font-bold text-slate-900 truncate">
+                  {currentUser?.name || "My Account"}
+                </p>
                 <p className="text-[10px] text-slate-500 uppercase tracking-tight font-medium truncate">
                   {role}
                 </p>
@@ -136,7 +150,7 @@ export function Sidebar({ role, className }: SidebarProps) {
               </motion.div>
             )}
           </AnimatePresence>
-        </div>
+        </button>
       </div>
     </motion.aside>
   );

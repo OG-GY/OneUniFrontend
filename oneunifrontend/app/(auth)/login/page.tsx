@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Content from "@/components/sections/(Auth)/content-section";
 import LoginForm from "@/components/forms/LoginForm";
 import { motion } from "framer-motion";
-import { login } from "@/lib/api/auth";
+import { getCurrentUser, getDashboardPathByRole, login } from "@/lib/api/auth";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -15,6 +15,13 @@ export default function LoginPage() {
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    const user = getCurrentUser();
+    if (user) {
+      router.replace(getDashboardPathByRole(user.role));
+    }
+  }, [router]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -43,19 +50,19 @@ export default function LoginPage() {
     if (Object.keys(newErrors).length === 0) {
       setIsLoading(true);
       try {
-        await login({
+        const response = await login({
           email: formData.email,
           password: formData.password,
         });
-        router.push("/redirecting");
+        router.push(getDashboardPathByRole(response.user.role));
       } catch (error: any) {
         console.error("Login error:", error);
-        // Handle specific error messages if possible (e.g. 401)
-        if (error.message.toLowerCase().includes("credentials") || error.message.toLowerCase().includes("invalid")) {
-           setErrors({ root: "Invalid email or password" });
-        } else {
-           setErrors({ root: error.message || "Login failed. Please try again." });
-        }
+        setErrors({
+          root:
+            error?.message?.toLowerCase().includes("invalid")
+              ? "Invalid email or password"
+              : error.message || "Login failed. Please try again.",
+        });
       } finally {
         setIsLoading(false);
       }

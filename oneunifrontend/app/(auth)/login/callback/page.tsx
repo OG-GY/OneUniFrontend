@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Loader2, CheckCircle } from "lucide-react";
 import Content from "@/components/sections/(Auth)/content-section";
+import { getCurrentUser, getDashboardPathByRole } from "@/lib/api/auth";
 
 type Status = "loading" | "success" | "error";
 
@@ -13,19 +14,25 @@ export default function LoginCallbackPage() {
   const [status, setStatus] = useState<Status>("loading");
 
   useEffect(() => {
-    // Backend has already set auth cookies via the OAuth callback
-    // Transition to success and redirect to dashboard
-    const timer = setTimeout(() => {
-      setStatus("success");
-    }, 1000);
+    const user = getCurrentUser();
+    if (!user) {
+      setStatus("error");
+      const timer = setTimeout(() => router.replace("/login"), 1500);
+      return () => clearTimeout(timer);
+    }
 
-    return () => clearTimeout(timer);
+    setStatus("success");
   }, []);
 
   useEffect(() => {
     if (status === "success") {
       const redirectTimer = setTimeout(() => {
-        router.push("/redirecting");
+        const user = getCurrentUser();
+        if (user) {
+          router.push(getDashboardPathByRole(user.role));
+        } else {
+          router.push("/login");
+        }
       }, 1500);
 
       return () => clearTimeout(redirectTimer);
@@ -71,6 +78,9 @@ export default function LoginCallbackPage() {
                 Redirecting to your dashboard...
               </p>
             </motion.div>
+          )}
+          {status === "error" && (
+            <p className="text-sm text-red-500">No active session found. Redirecting to login...</p>
           )}
         </motion.div>
       </div>

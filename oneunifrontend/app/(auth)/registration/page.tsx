@@ -1,13 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ChevronRight } from "lucide-react";
 import Content from "@/components/sections/(Auth)/content-section";
 import RegistrationForm from "@/components/forms/RegistrationForm";
 import Button from "@/components/ui/button";
-import { register } from "@/lib/api/auth";
-import type { Role } from "@/lib/api/auth";
+import { getCurrentUser, getDashboardPathByRole, register, type Role } from "@/lib/api/auth";
 
 export default function RegistrationPage() {
   const router = useRouter();
@@ -19,6 +18,13 @@ export default function RegistrationPage() {
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    const user = getCurrentUser();
+    if (user) {
+      router.replace(getDashboardPathByRole(user.role));
+    }
+  }, [router]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -64,13 +70,13 @@ export default function RegistrationPage() {
 
     setIsLoading(true);
     try {
-      await register({
+      const response = await register({
         fullName: formData.fullName,
         email: formData.email,
         password: formData.password,
         role: formData.role as Role,
       });
-      router.push("/redirecting");
+      router.push(getDashboardPathByRole(response.user.role));
     } catch (error: any) {
       if (error.message.includes("exists")) {
         setErrors((prev) => ({ ...prev, email: "User already exists" }));
