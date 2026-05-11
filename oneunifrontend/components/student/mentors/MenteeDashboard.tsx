@@ -1,6 +1,7 @@
 "use client";
 
 import React from 'react';
+import { useRouter } from 'next/navigation';
 import { StatsCard } from '@/components/cards/stats-card';
 import { SessionCard } from '@/components/cards/session-card';
 import { MentorCard } from '@/components/cards/mentor-card';
@@ -10,6 +11,7 @@ import Button from '@/components/ui/button';
 import Link from 'next/link';
 
 export function MenteeDashboard() {
+  const router = useRouter();
   const upcomingSessions = MOCK_SESSIONS.filter(s => s.status === 'scheduled');
   
   return (
@@ -48,7 +50,7 @@ export function MenteeDashboard() {
           <section>
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-bold text-gray-900">Your Schedule</h2>
-              <Button variant="link" className="text-primary p-0">View Calendar</Button>
+              <Button variant=\"link\" className=\"text-primary p-0\" onClick={() => router.push('/student/mentors/calendar')}>View Calendar</Button>
             </div>
             
             <div className="space-y-4">
@@ -59,7 +61,7 @@ export function MenteeDashboard() {
               ) : (
                 <div className="p-8 border border-dashed border-gray-200 rounded-xl text-center bg-gray-50">
                   <p className="text-gray-500">No upcoming sessions.</p>
-                  <Button variant="outline" className="mt-4">Book a Session</Button>
+                  <Button variant=\"outline\" className=\"mt-4\" onClick={() => router.push('/mentors')}>Book a Session</Button>
                 </div>
               )}
             </div>

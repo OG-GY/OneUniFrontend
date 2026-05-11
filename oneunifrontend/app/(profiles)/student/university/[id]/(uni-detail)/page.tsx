@@ -1,12 +1,14 @@
 "use client";
 
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { Building2, MapPin, Phone, Mail, Globe, ArrowRight } from "lucide-react";
 import { universities } from "@/lib/mockData";
 import Button from "@/components/ui/button";
 import { useParams } from "next/navigation";
 
 export default function UniversityOverviewPage() {
+  const router = useRouter();
   const params = useParams();
   const universityData = universities.find((item) => item.id === params.id);
   if (!universityData) return <div className="p-8">Not found</div>;
@@ -75,7 +77,7 @@ export default function UniversityOverviewPage() {
               Spread across the country, our campuses offer specialized programs and state-of-the-art facilities.
             </p>
           </div>
-          <Button variant="secondary" className="gap-2">
+          <Button variant="secondary" className="gap-2" onClick={() => router.push(`/student/university/${params.id}/locations`)}>
             View All Locations <ArrowRight size={16} />
           </Button>
         </div>

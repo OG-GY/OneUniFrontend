@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { FileText, Wallet, Trophy, CheckCircle2, Calendar, ArrowRight, Download, GraduationCap, BookOpen, PenTool, AlertCircle, FileCheck, ClipboardCheck, FileSignature } from "lucide-react";
 import { FeeStructure } from "@/components/university/FeeStructure";
 import { universities } from "@/lib/mockData";
@@ -8,6 +9,7 @@ import { cn } from "@/lib/utils";
 import { useParams } from "next/navigation";
 
 export default function UniversityAdmissionsPage() {
+  const router = useRouter();
   const params = useParams();
   const universityData = universities.find((item) => item.id === params.id);
   if (!universityData) return <div className="p-8">Not found</div>;
@@ -22,11 +24,11 @@ export default function UniversityAdmissionsPage() {
           <p className="text-text-body mt-1">Everything you need to know about applying to {universityData.shortName}.</p>
         </div>
         <div className="flex gap-3">
-          <Button variant="outline" className="gap-2">
+          <Button variant="outline" className="gap-2" onClick={() => alert('Download prospectus functionality coming soon!')}>
             <Download size={16} />
             Prospectus
           </Button>
-          <Button className="gap-2">
+          <Button className="gap-2" onClick={() => router.push('/registration')}>
             Apply Now
             <ArrowRight size={16} />
           </Button>

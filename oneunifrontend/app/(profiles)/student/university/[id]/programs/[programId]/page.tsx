@@ -190,7 +190,7 @@ export default function ProgramDetailsPage() {
                         NUST offers various need-based and merit-based scholarships to deserving students. 
                         Over 25% of our students receive some form of financial assistance.
                       </p>
-                      <Button variant="link" className="p-0 h-auto text-primary font-bold flex items-center gap-2">
+                      <Button variant="link" className="p-0 h-auto text-primary font-bold flex items-center gap-2" onClick={() => alert('Scholarship details page coming soon!')}>
                         View Scholarship Details <ArrowRight size={16} />
                       </Button>
                     </div>

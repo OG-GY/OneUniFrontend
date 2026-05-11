@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { MapPin, Globe, Phone, Mail, Calendar, Award, User, DollarSign, ExternalLink } from "lucide-react";
+import { useRouter } from "next/navigation";
 import Button from "@/components/ui/button";
 
 interface UniversityHeaderProps {
@@ -22,6 +23,12 @@ interface UniversityHeaderProps {
 }
 
 export function UniversityHeader({ data }: UniversityHeaderProps) {
+  const router = useRouter();
+  
+  const handleApplyForAdmission = () => {
+    router.push("/registration");
+  };
+  
   return (
     <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden mb-8">
       <div className="flex flex-col md:flex-row">
@@ -48,7 +55,7 @@ export function UniversityHeader({ data }: UniversityHeaderProps) {
           </div>
 
           <div className="flex flex-wrap gap-3 mt-2">
-            <Button className="bg-primary hover:bg-primary/90 text-white px-6 shadow-md shadow-primary/10">
+            <Button onClick={handleApplyForAdmission} className="bg-primary hover:bg-primary/90 text-white px-6 shadow-md shadow-primary/10">
               Apply for Admission
             </Button>
             <div className="flex gap-2">

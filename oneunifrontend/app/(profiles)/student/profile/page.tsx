@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { 
   User, GraduationCap, Users, FileText, MapPin, Clock, 
@@ -15,11 +16,27 @@ import { Badge } from '@/components/ui/badge';
 import { getUserProfile } from "@/lib/auth";
 
 export default function StudentProfilePage() {
+  const router = useRouter();
   const data = getUserProfile();
 
   if (!data) {
     return <div className="p-8">Not found</div>;
   }
+
+  const handleShare = () => {
+    const profileUrl = `${window.location.origin}/student/profile`;
+    navigator.clipboard.writeText(profileUrl);
+    alert('Profile link copied to clipboard!');
+  };
+
+  const handleExport = () => {
+    // Export profile as PDF or data
+    alert('Export functionality coming soon!');
+  };
+
+  const handleEditProfile = () => {
+    router.push('/student/profile/edit');
+  };
 
   const InfoItem = ({ label, value, icon: Icon, className }: { label: string, value: string | number | undefined, icon?: any, className?: string }) => (
     <div className={clsx("flex flex-col gap-1.5", className)}>
@@ -51,13 +68,13 @@ export default function StudentProfilePage() {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <Button variant="ghost" className="h-10 w-10 p-0 rounded-xl text-text-muted">
+            <Button variant="ghost" className="h-10 w-10 p-0 rounded-xl text-text-muted" onClick={handleShare}>
               <Share2 size={18} />
             </Button>
-            <Button variant="outline" className="h-10 rounded-xl border-slate-200 text-text-body px-4" iconLeft={<Download size={16} />}>
+            <Button variant="outline" className="h-10 rounded-xl border-slate-200 text-text-body px-4" iconLeft={<Download size={16} />} onClick={handleExport}>
               Export
             </Button>
-            <Button className="h-10 rounded-xl bg-primary hover:bg-primary/90 px-6 shadow-lg shadow-primary/20" iconLeft={<Edit3 size={16} />}>
+            <Button className="h-10 rounded-xl bg-primary hover:bg-primary/90 px-6 shadow-lg shadow-primary/20" iconLeft={<Edit3 size={16} />} onClick={handleEditProfile}>
               Edit Profile
             </Button>
           </div>

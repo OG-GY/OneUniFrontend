@@ -5,10 +5,8 @@ import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { GraduationCap, Briefcase, ChevronRight } from "lucide-react";
 import Content from "@/components/sections/(Auth)/content-section";
-import RoleSelector from "@/components/ui/role-selector";
+import RoleSelector, { type Role } from "@/components/ui/role-selector";
 import Button from "@/components/ui/button";
-
-import type { Role } from "@/lib/api/auth";
 
 export default function SelectRolePage() {
   const [role, setRole] = useState<Role | "">("");

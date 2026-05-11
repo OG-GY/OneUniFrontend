@@ -5,9 +5,9 @@ import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { GraduationCap, Briefcase, ChevronRight, Loader2, Building2 } from "lucide-react";
 import Content from "@/components/sections/(Auth)/content-section";
-import RoleSelector from "@/components/ui/role-selector";
+import RoleSelector, { type Role } from "@/components/ui/role-selector";
 import Button from "@/components/ui/button";
-import { register, type Role, getDashboardPathByRole } from "@/lib/api/auth";
+import { register, getDashboardPathByRole } from "@/lib/api/auth";
 
 export default function SignupCallbackPage() {
   const router = useRouter();

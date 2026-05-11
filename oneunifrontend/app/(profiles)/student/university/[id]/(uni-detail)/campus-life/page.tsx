@@ -1,7 +1,8 @@
 "use client";
 
-import { 
-  Coffee, Users, ArrowRight, Music, Book, Heart, Camera, MapPin, 
+import { useRouter } from "next/navigation";
+import {
+  Coffee, Users, ArrowRight, Music, Book, Heart, Camera, MapPin,
   Home, Dumbbell, Stethoscope, Bus, Utensils, Mic2, FlaskConical, Library,
   Wifi, ShieldCheck
 } from "lucide-react";
@@ -11,6 +12,7 @@ import { cn } from "@/lib/utils";
 import { useParams } from "next/navigation";
 
 export default function UniversityCampusLifePage() {
+  const router = useRouter();
   const params = useParams();
   const universityData = universities.find((item) => item.id === params.id);
   if (!universityData) return <div className="p-8">Not found</div>;
@@ -39,7 +41,7 @@ export default function UniversityCampusLifePage() {
           <h2 className="text-3xl font-bold text-text-main">Campus Life</h2>
           <p className="text-text-body mt-1">Discover the vibrant community and world-class facilities at NUST.</p>
         </div>
-        <Button variant="outline" className="gap-2">
+        <Button variant="outline" className="gap-2" onClick={() => alert('Campus map feature coming soon!')}>
           <MapPin size={16} />
           View Campus Map
         </Button>

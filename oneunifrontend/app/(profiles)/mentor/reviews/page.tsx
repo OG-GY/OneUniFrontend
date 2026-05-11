@@ -40,7 +40,11 @@ export default function MentorReviewsPage() {
         </div>
         
         <div className="flex items-center gap-3">
-          <Button variant="outline" className="border-slate-200 text-base font-bold text-slate-600 bg-white gap-2 px-6 h-12 rounded-2xl shadow-sm">
+          <Button variant="outline" className="border-slate-200 text-base font-bold text-slate-600 bg-white gap-2 px-6 h-12 rounded-2xl shadow-sm" onClick={() => {
+            const profileUrl = `${window.location.origin}/mentor/profile`;
+            navigator.clipboard.writeText(profileUrl);
+            alert('Profile link copied to clipboard!');
+          }}>
              Share Profile
           </Button>
         </div>

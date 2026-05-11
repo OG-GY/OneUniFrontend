@@ -75,9 +75,6 @@ export function ProgramHeader({
           >
             Apply Now
           </Button>
-          <Button variant="outline" className="w-full py-6 text-lg font-bold">
-            Download Brochure
-          </Button>
         </div>
       </div>
     </div>
